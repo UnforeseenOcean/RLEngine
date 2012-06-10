@@ -1,0 +1,8 @@
+syntax: glob
+*/[Dd]ebug/
+*/[Rr]elease/
+*/ipch/
+*.sdf
+*.suo
+*.vcxproj.user
+lastrun.log
