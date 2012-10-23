@@ -1,19 +1,19 @@
 #include "PCH.hpp"
 #include "CInput.hpp"
 
-InputClass::InputClass() {
+CInput::CInput() {
 	m_directInput = nullptr;
 	m_keyboard = nullptr;
 	m_mouse = nullptr;
 }
 
-InputClass::InputClass(const InputClass&) {
+CInput::CInput(const CInput&) {
 }
 
-InputClass::~InputClass() {
+CInput::~CInput() {
 }
 
-bool InputClass::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeight) {
+bool CInput::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeight) {
 	HRESULT result;
 
 	m_screenWidth = screenWidth;
@@ -70,7 +70,7 @@ bool InputClass::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, int
 	return true;
 }
 
-void InputClass::Shutdown() {
+void CInput::Shutdown() {
 	if(m_mouse != nullptr) {
 		m_mouse->Unacquire();
 		m_mouse->Release();
@@ -88,7 +88,7 @@ void InputClass::Shutdown() {
 	return;
 }
 
-bool InputClass::Frame() {
+bool CInput::Frame() {
 	bool result;
 
 	result = ReadKeyboard();
@@ -106,7 +106,7 @@ bool InputClass::Frame() {
 	return true;
 }
 
-bool InputClass::ReadKeyboard() {
+bool CInput::ReadKeyboard() {
 	HRESULT result;
 	result = m_keyboard->GetDeviceState(sizeof(m_keyboardState), (LPVOID)&m_keyboardState);
 	if(FAILED(result)) {
@@ -121,7 +121,7 @@ bool InputClass::ReadKeyboard() {
 	return true;
 }
 
-bool InputClass::ReadMouse() {
+bool CInput::ReadMouse() {
 	HRESULT result;
 
 	result = m_mouse->GetDeviceState(sizeof(DIMOUSESTATE), (LPVOID)&m_mouseState);
@@ -137,7 +137,7 @@ bool InputClass::ReadMouse() {
 	return true;
 }
 
-void InputClass::ProcessInput() {
+void CInput::ProcessInput() {
 	m_mouseX += m_mouseState.lX;
 	m_mouseY += m_mouseState.lY;
 
@@ -158,13 +158,13 @@ void InputClass::ProcessInput() {
 	return;
 }
 
-void InputClass::GetMouseLocation(int& mouseX, int& mouseY) {
+void CInput::GetMouseLocation(int& mouseX, int& mouseY) {
 	mouseX = m_mouseX;
 	mouseY = m_mouseY;
 	return;
 }
 
-bool InputClass::IsEscapePressed() {
+bool CInput::IsEscapePressed() {
 	if(m_keyboardState[DIK_ESCAPE] & 0x80) {
 		return true;
 	}
@@ -172,7 +172,7 @@ bool InputClass::IsEscapePressed() {
 	return false;
 }
 
-bool InputClass::IsLeftArrowPressed() {
+bool CInput::IsLeftArrowPressed() {
 	if(m_keyboardState[DIK_LEFT] & 0x80) {
 		return true;
 	}
@@ -180,7 +180,7 @@ bool InputClass::IsLeftArrowPressed() {
 	return false;
 }
 
-bool InputClass::IsRightArrowPressed() {
+bool CInput::IsRightArrowPressed() {
 	if(m_keyboardState[DIK_RIGHT] & 0x80) {
 		return true;
 	}
@@ -188,7 +188,7 @@ bool InputClass::IsRightArrowPressed() {
 	return false;
 }
 
-bool InputClass::IsUpArrowPressed() {
+bool CInput::IsUpArrowPressed() {
 	if(m_keyboardState[DIK_UP] & 0x80) {
 		return true;
 	}
@@ -196,7 +196,7 @@ bool InputClass::IsUpArrowPressed() {
 	return false;
 }
 
-bool InputClass::IsDownArrowPressed() {
+bool CInput::IsDownArrowPressed() {
 	if(m_keyboardState[DIK_DOWN] & 0x80) {
 		return true;
 	}
@@ -204,7 +204,7 @@ bool InputClass::IsDownArrowPressed() {
 	return false;
 }
 
-bool InputClass::IsPgUpPressed() {
+bool CInput::IsPgUpPressed() {
 	if(m_keyboardState[DIK_PGUP] & 0x80) {
 		return true;
 	}
@@ -212,7 +212,7 @@ bool InputClass::IsPgUpPressed() {
 	return false;
 }
 
-bool InputClass::IsPgDownPressed() {
+bool CInput::IsPgDownPressed() {
 	if(m_keyboardState[DIK_PGDN] & 0x80) {
 		return true;
 	}
@@ -220,7 +220,7 @@ bool InputClass::IsPgDownPressed() {
 	return false;
 }
 
-bool InputClass::IsWPressed() {
+bool CInput::IsWPressed() {
 	if(m_keyboardState[DIK_W] & 0x80) {
 		return true;
 	}
@@ -228,7 +228,7 @@ bool InputClass::IsWPressed() {
 	return false;
 }
 
-bool InputClass::IsAPressed() {
+bool CInput::IsAPressed() {
 	if(m_keyboardState[DIK_A] & 0x80) {
 		return true;
 	}
@@ -236,7 +236,7 @@ bool InputClass::IsAPressed() {
 	return false;
 }
 
-bool InputClass::IsSPressed() {
+bool CInput::IsSPressed() {
 	if(m_keyboardState[DIK_S] & 0x80) {
 		return true;
 	}
@@ -244,7 +244,7 @@ bool InputClass::IsSPressed() {
 	return false;
 }
 
-bool InputClass::IsDPressed() {
+bool CInput::IsDPressed() {
 	if(m_keyboardState[DIK_D] & 0x80) {
 		return true;
 	}
@@ -252,7 +252,7 @@ bool InputClass::IsDPressed() {
 	return false;
 }
 
-bool InputClass::IsZPressed() {
+bool CInput::IsZPressed() {
 	if(m_keyboardState[DIK_Z] & 0x80) {
 		return true;
 	}

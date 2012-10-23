@@ -4,8 +4,7 @@
 
 #include <d3d11.h>
 
-CModelManager::CModelManager() {
-	m_iNumMeshes = 0;
+CModelManager::CModelManager() : m_iNumMeshes(0) {
 }
 
 CModelManager::CModelManager(const CModelManager&) {
@@ -14,9 +13,7 @@ CModelManager::CModelManager(const CModelManager&) {
 CModelManager::~CModelManager() {
 }
 
-bool CModelManager::Init(ID3D11Device* device) {
-	m_pDevice = device;
-
+bool CModelManager::Init() {
 	return true;
 }
 
@@ -26,12 +23,15 @@ void CModelManager::Shutdown() {
 	}
 }
 
-int CModelManager::AddFromFile(char *filename) {
+int CModelManager::AddFromFile(ID3D11Device* device, const char *filename) {
 	RL_ASSERT(m_iNumMeshes < MAX_MESHES, "Too many meshes!");
-	m_pModel[m_iNumMeshes] = new (nothrow) ModelClass();
-	RL_ASSERT(m_pModel[m_iNumMeshes] != nullptr, "Ugh new[] failed");
-
-	m_pModel[m_iNumMeshes]->Initialize(m_pDevice, filename);
+	m_pModel[m_iNumMeshes] = new (nothrow) CModel();
+	if(m_pModel[m_iNumMeshes] == nullptr) {
+		return -1;
+	}
+	if(!m_pModel[m_iNumMeshes]->Initialize(device, filename)) {
+		return -1;
+	}
 	
 	int result = m_iNumMeshes;
 	++m_iNumMeshes;
@@ -39,6 +39,10 @@ int CModelManager::AddFromFile(char *filename) {
 	return result;
 }
 
-ModelClass* CModelManager::GetModel(int modelID) {
+CModel* CModelManager::GetModel(int modelID) {
 	return m_pModel[modelID];
+}
+
+int CModelManager::GetModelCount() {
+	return m_iNumMeshes;
 }

@@ -3,11 +3,11 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
-class TimerClass {
+class CTimer {
 public:
-	TimerClass();
-	TimerClass(const TimerClass&);
-	~TimerClass();
+	CTimer();
+	CTimer(const CTimer&);
+	~CTimer();
 
 	bool Initialize();
 	void Frame();

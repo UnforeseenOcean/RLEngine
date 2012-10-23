@@ -1,16 +1,16 @@
 #include "PCH.hpp"
 #include "CTimer.hpp"
 
-TimerClass::TimerClass() {
+CTimer::CTimer() {
 }
 
-TimerClass::TimerClass(const TimerClass&) {
+CTimer::CTimer(const CTimer&) {
 }
 
-TimerClass::~TimerClass() {
+CTimer::~CTimer() {
 }
 
-bool TimerClass::Initialize() {
+bool CTimer::Initialize() {
 	QueryPerformanceFrequency((LARGE_INTEGER*)&m_frequency);
 	if(m_frequency == 0) {
 		return false;
@@ -23,7 +23,7 @@ bool TimerClass::Initialize() {
 	return true;
 }
 
-void TimerClass::Frame() {
+void CTimer::Frame() {
 	long long currentTime;
 	float timeDifference;
 
@@ -38,6 +38,6 @@ void TimerClass::Frame() {
 	return;
 }
 
-float TimerClass::GetTime() {
+float CTimer::GetTime() {
 	return m_frameTime;
 }

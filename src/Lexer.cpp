@@ -18,19 +18,21 @@ bool IsNumeric(const char *text) {
 
 	bool hasDot = false;
 	for(int i=0; text[i] != '\0'; i++) {
-		if(text[i] == '.' && !hasDot)
+		if(text[i] == '.' && !hasDot) {
 			hasDot = true;
-		else if(!IsDigit(text[i]))
+		}
+		else if(!IsDigit(text[i])) {
 			return false;
+		}
 	}
 	return true;
 }
 
-Token::Token( const char *data ) {
+Token::Token(const char *data) {
 	string = data;
 }
 
-const char *Token::GetString() const {
+const char* Token::GetString() const {
 	return string;
 }
 
@@ -234,7 +236,9 @@ bool Lexer::LoadFile(const char *filename) {
 	}
 
 	filemapping = CreateFileMappingA(file, NULL, PAGE_READONLY, 0, 0, NULL);
-	
+	if (filemapping == INVALID_HANDLE_VALUE) {
+		return false;
+	}
 	buffer = (unsigned char* const)MapViewOfFile(filemapping, FILE_MAP_READ, 0, 0, 0);
 
 	name = filename;
@@ -245,11 +249,12 @@ bool Lexer::LoadFile(const char *filename) {
 
 	unsigned char bom[] = { 0xEF, 0xBB, 0xBF };
 	hasByteOrderMark = memcmp(buffer, bom, 3) == 0;
-	if(hasByteOrderMark)
+	if(hasByteOrderMark) {
+		Console::Print("Warning: File has Byte Order Mark");
 		bufPos = 3;
+	}
 	else {
 		bufPos = 0;
-		Console::Print("Warning: File has Byte Order Mark");
 	}
 
 	bufferIsFile = true;
@@ -259,7 +264,7 @@ bool Lexer::LoadFile(const char *filename) {
 	return true;
 }
 
-void Lexer::SkipRestOfLine( void ) {
+void Lexer::SkipRestOfLine() {
 	while(bufPos < bufSize) {
 		if(buffer[bufPos] == '\n' || buffer[bufPos] == '\r') {
 			FinishLine();
@@ -272,12 +277,12 @@ void Lexer::SkipRestOfLine( void ) {
 
 void Lexer::SkipWhiteSpaces( void ) {
 	bufPos++;
-	while ( bufPos < bufSize && (buffer[bufPos] == ' ' || buffer[bufPos] == '\t') )
+	while(bufPos < bufSize && (buffer[bufPos] == ' ' || buffer[bufPos] == '\t') )
 		bufPos++;
 }
 
-void Lexer::FinishLine( void ) {
-	if ( buffer[bufPos] == '\r' )
+void Lexer::FinishLine() {
+	if (buffer[bufPos] == '\r')
 		bufPos += 2; // skip \n too
 	else
 		bufPos++;
@@ -286,7 +291,7 @@ void Lexer::FinishLine( void ) {
 	line++;
 }
 
-void Lexer::FinishToken( bool allowEmpty ) {
+void Lexer::FinishToken(bool allowEmpty) {
 	if ( tokPos || allowEmpty ) {
 		tokenBuffer[tokPos] = '\0';
 		token.line = line;
@@ -295,7 +300,7 @@ void Lexer::FinishToken( bool allowEmpty ) {
 	}
 }
 
-void Lexer::AddToToken( char c ) {
+void Lexer::AddToToken(char c) {
 	if ( !hasByteOrderMark && c < 0 )
 		tokenBuffer[tokPos] = '?';
 	else
@@ -303,11 +308,11 @@ void Lexer::AddToToken( char c ) {
 	tokPos++;
 }
 
-void Lexer::SetSingleTokenChars( const char *chars ) {
+void Lexer::SetSingleTokenChars(const char *chars) {
 	singleTokenChars = chars;
 }
 
-void Lexer::SetCommentStrings( const char *line/*, const char *blockStart, const char *blockEnd*/ ) {
+void Lexer::SetCommentStrings(const char *line/*, const char *blockStart, const char *blockEnd*/) {
 	lineComment = line;
 	//blockComment[0] = blockStart;
 	//blockComment[1] = blockEnd;

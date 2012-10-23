@@ -2,10 +2,10 @@
 #include "CMouse.hpp"
 
 #ifndef HID_USAGE_PAGE_GENERIC
-	#define HID_USAGE_PAGE_GENERIC ( (const USHORT)0x01)
+	#define HID_USAGE_PAGE_GENERIC ((const USHORT)0x01)
 #endif
 #ifndef HID_USAGE_GENERIC_MOUSE
-	#define HID_USAGE_GENERIC_MOUSE ( (const USHORT)0x02)
+	#define HID_USAGE_GENERIC_MOUSE ((const USHORT)0x02)
 #endif
 
 CMouse::CMouse() {
@@ -25,7 +25,7 @@ CMouse::~CMouse() {
 bool CMouse::Initialize(HWND hwnd) {
 	m_RawDevice[0].usUsagePage = 0x01; 
 	m_RawDevice[0].usUsage = HID_USAGE_GENERIC_MOUSE; 
-	m_RawDevice[0].dwFlags = RIDEV_NOLEGACY;   // adds HID mouse and also ignores legacy mouse messages
+	m_RawDevice[0].dwFlags = RIDEV_NOLEGACY; // adds HID mouse and also ignores legacy mouse messages
 	m_RawDevice[0].hwndTarget = hwnd;
 
 	if (RegisterRawInputDevices(m_RawDevice, 1, sizeof(m_RawDevice[0])) == FALSE) {
@@ -42,7 +42,6 @@ void CMouse::Shutdown() {
 
 void CMouse::Update(RAWINPUT& lpb) {
 	if(lpb.data.mouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_DOWN) {
-		Console::Print("Mouse Pressed");
 		m_LeftButtonDown = true;
 	}
 
@@ -51,7 +50,6 @@ void CMouse::Update(RAWINPUT& lpb) {
 	}
 
 	if(lpb.data.mouse.usButtonFlags & RI_MOUSE_WHEEL) {
-		short dwWheel = static_cast<short>(lpb.data.mouse.usButtonData);
 		if(lpb.data.mouse.usButtonData == 120) { //down: 65416 up: 120			
 			m_WheelForward = true;
 			m_WheelBackward = false;

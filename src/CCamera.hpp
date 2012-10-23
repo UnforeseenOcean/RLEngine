@@ -8,27 +8,17 @@ public:
 	CCamera(const CCamera&);
 	~CCamera();
 
-	void SetPosition(float, float, float);
-	void SetRotation(float, float, float);
+	void SetPosition(DirectX::XMFLOAT3 pos);
+	void SetRotation(DirectX::XMFLOAT3 rot);
 
-	DirectX::XMVECTOR GetPosition();
-	DirectX::XMVECTOR GetRotation();
+	DirectX::XMFLOAT3 GetPosition();
+	DirectX::XMFLOAT3 GetRotation();	
+	DirectX::XMMATRIX GetViewMatrix();
 
 	void Render();
-	void GetViewMatrix(DirectX::XMMATRIX&);
-
-	//void RenderBaseViewMatrix();
-	//void GetBaseViewMatrix(DirectX::XMMATRIX&);
-
 private:
-	float m_positionX;
-	float m_positionY;
-	float m_positionZ;
-
-	float m_rotationX;
-	float m_rotationY;
-	float m_rotationZ;
+	DirectX::XMFLOAT3 m_Position;
+	DirectX::XMFLOAT3 m_Rotation;
 	DirectX::XMMATRIX m_viewMatrix;
-	//DirectX::XMMATRIX m_baseViewMatrix;
 	// AR, FoV, zNear, zFar
 };

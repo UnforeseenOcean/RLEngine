@@ -1,11 +1,12 @@
 #include "PCH.hpp"
 #include "CSystem.hpp"
+#include "CModel.hpp"
 
 CSystem* CSystem::ApplicationHandle = nullptr;
 
 CSystem::CSystem() {
 	m_Input = nullptr;
-	m_Graphics = nullptr;
+	m_Renderer = nullptr;
 	m_Timer = nullptr;
 	m_Mouse = nullptr;
 }
@@ -22,7 +23,7 @@ bool CSystem::Initialize() {
 	}
 	CSystem::ApplicationHandle = this;
 	m_hinstance = GetModuleHandle(NULL);
-	m_applicationName = L"RLEngine";
+	m_applicationName = L"RLModelViewer";
 
 	bool result = Console::Initialize();
 	if(!result) {
@@ -34,85 +35,76 @@ bool CSystem::Initialize() {
 	Console::Print("Debug Binaries");
 #endif
 
-	/*int screenWidth = 0;
-	int screenHeight = 0;
-
-	InitializeWindows(screenWidth, screenHeight);*/
-
 	m_Window = new (nothrow) CWindow;
 	if(m_Window == nullptr) {
 		return false;
 	}
-
 	result = m_Window->Initialize(m_hinstance, m_applicationName, this);
 	if(!result) {
 		MessageBox(nullptr, L"Could not initialize the window object.", L"Error", MB_OK);
 		return false;
 	}
 
-	m_Input = new InputClass;
-	if(m_Input == nullptr) {
-		return false;
-	}
-
-	result = m_Input->Initialize(m_hinstance, m_Window->GethWnd(), m_Window->GetWidth(), m_Window->GetHeight());
-	if(!result) {
-		MessageBox(m_Window->GethWnd(), L"Could not initialize the input object.", L"Error", MB_OK);
-		return false;
-	}
-
-	m_Graphics = new GraphicsClass;
-	if(m_Graphics == nullptr) {
-		return false;
-	}
-
-	result = m_Graphics->Initialize(m_Window->GethWnd(), m_Window->GetWidth(), m_Window->GetHeight());
-	if(!result) {
-		return false;
-	}
-	
-	m_Timer = new TimerClass;
+	m_Timer = new CTimer;
 	if(m_Timer == nullptr) {
 		return false;
 	}
-
 	result = m_Timer->Initialize();
 	if(!result) {
 		MessageBox(m_Window->GethWnd(), L"Could not initialize the Timer object.", L"Error", MB_OK);
 		return false;
 	}
 
+	/*m_Input = new CInput;
+	if(m_Input == nullptr) {
+		return false;
+	}
+	result = m_Input->Initialize(m_hinstance, m_Window->GethWnd(), m_Window->GetWidth(), m_Window->GetHeight());
+	if(!result) {
+		MessageBox(m_Window->GethWnd(), L"Could not initialize the input object.", L"Error", MB_OK);
+		return false;
+	}*/
+
 	m_Mouse = new (nothrow) CMouse;
 	if(m_Mouse == nullptr) {
 		return false;
 	}
-
 	result = m_Mouse->Initialize(m_Window->GethWnd());
 	if(!result) {
 		MessageBox(m_Window->GethWnd(), L"Could not initialize the Mouse object.", L"Error", MB_OK);
 		return false;
 	}
+
+	m_Renderer = new CRenderer;
+	if(m_Renderer == nullptr) {
+		return false;
+	}
+	result = m_Renderer->Initialize(m_Window->GethWnd(), m_Window->GetWidth(), m_Window->GetHeight(), m_Window->GetFullscreen());
+	if(!result) {
+		return false;
+	}
+			
+	int model = m_Renderer->AddModel("data/models/podium.obj");
+	if(model == -1) {
+		MessageBox(m_Window->GethWnd(), L"Could not initialize data/models/podium.obj.", L"Error", MB_OK);
+		return false;
+	}
+	model = m_Renderer->AddModel("data/models/piano.obj");
+	if(model == -1) {
+		MessageBox(m_Window->GethWnd(), L"Could not initialize data/models/podium.obj.", L"Error", MB_OK);
+		return false;
+	}
+	m_Renderer->GetModelManager()->GetModel(model)->SetPosition(DirectX::XMFLOAT3(0.0f, 6.0f, 0.0f));
+	m_Renderer->GetModelManager()->GetModel(model)->SetRotation(DirectX::XMFLOAT3(0.0f, 45.0f, 0.0f));
 	
 	return true;
 }
 
 void CSystem::Shutdown() {
+	SAFE_SHUTDOWN(m_Renderer);
 	SAFE_SHUTDOWN(m_Mouse);
-
-	if(m_Timer != nullptr) {
-		delete m_Timer;
-	}
-
-	if(m_Graphics != nullptr) {
-		m_Graphics->Shutdown();
-		delete m_Graphics;
-	}
-
-	if(m_Input != nullptr) {
-		m_Input->Shutdown();
-		delete m_Input;
-	}
-	
+	//SAFE_SHUTDOWN(m_Input);
+	SAFE_DELETE(m_Timer);	
 	SAFE_SHUTDOWN(m_Window);
 
 	Console::Shutdown();
@@ -126,12 +118,11 @@ void CSystem::Shutdown() {
 
 void CSystem::Run() {
 	MSG msg;
-	bool done;
 	bool result;
 
 	ZeroMemory(&msg, sizeof(MSG));
 
-	done = false;
+	bool done = false;
 	while(!done) {
 		while(PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
 			if(msg.message == WM_QUIT) {
@@ -149,23 +140,21 @@ void CSystem::Run() {
 			done = true;
 		}
 
-		if(m_Input->IsEscapePressed()) {
-			done = true;
-		}
+		//if(m_Input->IsEscapePressed()) {
+		//	done = true;
+		//}
 	}
-
-	return;
 }
 
 bool CSystem::Frame() {
 	m_Timer->Frame();
 
-	bool result = m_Input->Frame();
+	bool result;/* = m_Input->Frame();
 	if(!result) {
 		return false;
-	}
-
-	result = m_Graphics->Frame(m_Mouse->GetX(), m_Mouse->GetY(), m_Mouse->IsLeftButtonPressed(), m_Mouse->IsWheelForward(), m_Mouse->IsWheelBackward());
+	}*/
+	
+	result = m_Renderer->Frame(m_Mouse->GetX(), m_Mouse->GetY(), m_Mouse->IsLeftButtonPressed(), m_Mouse->IsWheelForward(), m_Mouse->IsWheelBackward());
 	if(!result) {
 		return false;
 	}
@@ -180,31 +169,30 @@ LRESULT CSystem::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lpar
 			PostQuitMessage(0);
 			return 0;
 		}
-		break;
-
+			break;
 		case WM_CLOSE:
 		{
 			PostQuitMessage(0);
 			return 0;
 		}
-		break;
-
+			break;
 		case WM_INPUT:
 		{
 			unsigned int rawInputSize = sizeof(RAWINPUT);
 			static BYTE lpb[sizeof(RAWINPUT)];
-			if(GetRawInputData((HRAWINPUT)lparam, RID_INPUT, lpb, &rawInputSize, sizeof(RAWINPUTHEADER)) == 0xFFFFFFFF) {
+			unsigned result = GetRawInputData((HRAWINPUT)lparam, RID_INPUT, lpb, &rawInputSize, sizeof(RAWINPUTHEADER));
+			if(result == 0xFFFFFFFF) {
 				//bprintf("Error in GetRawInputData - GLE: %u, Size: %u\n", GetLastError(), sizeof(RAWINPUT) );
-				RL_ASSERT(false, "Error in GetRawInputData");
+				Console::Print("Error in GetRawInputData!");
+				PostQuitMessage(1);
 				break;
 			}
 
 			if (((RAWINPUT&)lpb).header.dwType == RIM_TYPEMOUSE) {
 				m_Mouse->Update((RAWINPUT&)lpb);
-			}			
+			}
 		}
-		break;
-
+			break;
 		default:
 		{
 			return DefWindowProc(hwnd, umsg, wparam, lparam);

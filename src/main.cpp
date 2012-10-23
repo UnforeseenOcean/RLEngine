@@ -14,5 +14,5 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	system->Shutdown();
 	delete system;
-	return 0;
+	return !result;
 }

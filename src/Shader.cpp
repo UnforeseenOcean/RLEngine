@@ -7,21 +7,21 @@
 
 using namespace DirectX;
 
-ColorShaderClass::ColorShaderClass() {
+ModelShaderClass::ModelShaderClass() {
 	m_vertexShader = nullptr;
 	m_pixelShader = nullptr;
 	m_layout = nullptr;
 	m_matrixBuffer = nullptr;
 }
 
-ColorShaderClass::ColorShaderClass(const ColorShaderClass&) {
+ModelShaderClass::ModelShaderClass(const ModelShaderClass&) {
 }
 
 
-ColorShaderClass::~ColorShaderClass() {
+ModelShaderClass::~ModelShaderClass() {
 }
 
-bool ColorShaderClass::Initialize(ID3D11Device* device, HWND hwnd) {
+bool ModelShaderClass::Initialize(ID3D11Device* device, HWND hwnd) {
 	bool result = InitializeShader(device, hwnd, L"../shaders/VertexShader.hlsl", L"../shaders/PixelShader.hlsl");
 	if(!result) {
 		return false;
@@ -30,12 +30,11 @@ bool ColorShaderClass::Initialize(ID3D11Device* device, HWND hwnd) {
 	return true;
 }
 
-void ColorShaderClass::Shutdown() {
+void ModelShaderClass::Shutdown() {
 	ShutdownShader();
-	return;
 }
 
-bool ColorShaderClass::Render(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX& worldMatrix, XMMATRIX& viewMatrix, XMMATRIX& projectionMatrix) {
+bool ModelShaderClass::Render(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX& worldMatrix, XMMATRIX& viewMatrix, XMMATRIX& projectionMatrix) {
 	bool result = SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix);
 	if(!result) {
 		return false;
@@ -45,7 +44,7 @@ bool ColorShaderClass::Render(ID3D11DeviceContext* deviceContext, int indexCount
 	return true;
 }
 
-bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename) {
+bool ModelShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename) {
 	ID3D10Blob* errorMessage = nullptr;
 	ID3D10Blob* vertexShaderBuffer = nullptr;
 	ID3D10Blob* pixelShaderBuffer =	nullptr;
@@ -129,31 +128,14 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* 
 	return true;
 }
 
-void ColorShaderClass::ShutdownShader() {
-	if(m_matrixBuffer != nullptr) {
-		m_matrixBuffer->Release();
-		m_matrixBuffer = 0;
-	}
-
-	if(m_layout != nullptr) {
-		m_layout->Release();
-		m_layout = 0;
-	}
-
-	if(m_pixelShader != nullptr) {
-		m_pixelShader->Release();
-		m_pixelShader = 0;
-	}
-
-	if(m_vertexShader != nullptr) {
-		m_vertexShader->Release();
-		m_vertexShader = 0;
-	}
-
-	return;
+void ModelShaderClass::ShutdownShader() {
+	SAFE_RELEASE(m_matrixBuffer);
+	SAFE_RELEASE(m_layout);
+	SAFE_RELEASE(m_pixelShader);
+	SAFE_RELEASE(m_vertexShader);
 }
 
-void ColorShaderClass::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwnd, WCHAR* shaderFilename) {	
+void ModelShaderClass::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwnd, WCHAR* shaderFilename) {	
 	ofstream fout;
 
 	const char* compileErrors = (char*)(errorMessage->GetBufferPointer());
@@ -170,11 +152,9 @@ void ColorShaderClass::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND h
 	errorMessage->Release();
 
 	MessageBox(hwnd, L"Error compiling shader. Check shader-error.txt", shaderFilename, MB_OK);
-
-	return;
 }
 
-bool ColorShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX& worldMatrix, XMMATRIX& viewMatrix, XMMATRIX& projectionMatrix) {
+bool ModelShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX& worldMatrix, XMMATRIX& viewMatrix, XMMATRIX& projectionMatrix) {
     D3D11_MAPPED_SUBRESOURCE mappedResource;
 
 	worldMatrix = XMMatrixTranspose(worldMatrix);
@@ -200,7 +180,7 @@ bool ColorShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, X
 }
 
 
-void ColorShaderClass::RenderShader(ID3D11DeviceContext* deviceContext, int indexCount) {
+void ModelShaderClass::RenderShader(ID3D11DeviceContext* deviceContext, int indexCount) {
 	deviceContext->IASetInputLayout(m_layout);
     deviceContext->VSSetShader(m_vertexShader, NULL, 0);
     deviceContext->PSSetShader(m_pixelShader, NULL, 0);

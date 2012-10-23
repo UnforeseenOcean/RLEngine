@@ -15,7 +15,7 @@ public:
 	
 	inline ConVar& operator=(int value) {
 		if(value < m_min) {
-			//TODO: Warn to console/file
+			//todo: log error.
 			m_value = m_min;
 		}
 		if(value > m_max) {
@@ -33,25 +33,25 @@ private:
 	inline void AddToList();
 
 	ConVar* m_next;
+	int m_value;
 	const char* m_name;
 	const char* m_description;
 	const int m_min;
 	const int m_max;
-	int m_value;
 };
 
-namespace ConVarns {
+namespace _Internal_ConVar {
 	static ConVar* head = nullptr;
 	static ConVar* tail = nullptr;
 }
 
 void ConVar::AddToList() {
-	if(ConVarns::head != nullptr) {
-		ConVarns::tail->m_next = this;
-		ConVarns::tail = this;
+	if(_Internal_ConVar::head != nullptr) {
+		_Internal_ConVar::tail->m_next = this;
+		_Internal_ConVar::tail = this;
 	}
 	else {
-		ConVarns::head = this;
-		ConVarns::tail = this;
+		_Internal_ConVar::head = this;
+		_Internal_ConVar::tail = this;
 	}
 }

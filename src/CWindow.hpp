@@ -11,12 +11,13 @@ public:
 	CWindow(const CWindow&);
 	~CWindow();
 
-	bool Initialize(HINSTANCE hInstance, const wchar_t* wszTitle, CSystem*);
+	bool Initialize(HINSTANCE hInstance, const wchar_t* wszTitle, CSystem* parent);
 	void Shutdown();
 
 	HWND GethWnd();
 	int GetWidth();
 	int GetHeight();
+	bool GetFullscreen();
 
 private:
 	HWND m_hWnd;

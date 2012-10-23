@@ -2,28 +2,37 @@
 #include "CRenderer.hpp"
 #include "CModel.hpp"
 
-GraphicsClass::GraphicsClass() {
+CRenderer::CRenderer() {
 	m_D3D = nullptr;
-	m_Camera = nullptr;
 	m_ModelManager = nullptr;
-	m_ColorShader = 0;
+	m_Camera = nullptr;
+	m_ModelShader = 0;
 }
 
-GraphicsClass::GraphicsClass(const GraphicsClass&) {
+CRenderer::CRenderer(const CRenderer&) {
 }
 
-GraphicsClass::~GraphicsClass() {
+CRenderer::~CRenderer() {
 }
 
-bool GraphicsClass::Initialize(HWND hwnd, int screenWidth, int screenHeight) {
-	m_D3D = new D3DClass;
+bool CRenderer::Initialize(HWND hwnd, int screenWidth, int screenHeight, bool fullscreen) {
+	m_D3D = new CDirect3D11;
 	if(m_D3D == nullptr) {
 		return false;
 	}
-
-	bool result = m_D3D->Initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
+	bool result = m_D3D->Initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, fullscreen, SCREEN_DEPTH, SCREEN_NEAR);
 	if(!result) {
 		MessageBox(hwnd, L"Could not Initialize D3D", L"Error", MB_OK);
+		return false;
+	}
+	
+	m_ModelManager = new (nothrow) CModelManager;
+	if(m_ModelManager == nullptr) {
+		return false;
+	}
+	result = m_ModelManager->Init();
+	if(!result) {
+		MessageBox(hwnd, L"Could not initialize the ModelManager object.", L"Error", MB_OK);
 		return false;
 	}
 
@@ -31,63 +40,45 @@ bool GraphicsClass::Initialize(HWND hwnd, int screenWidth, int screenHeight) {
 	if(m_Camera == nullptr) {
 		return false;
 	}
-	m_Camera->SetPosition(0.0f, 0.0f, -3.0f);
-
-
-	m_ModelManager = new (nothrow) CModelManager;
-	if(m_ModelManager == nullptr) {
-		return false;
-	}
-
-	m_ModelManager->Init(m_D3D->GetDevice());
+	m_Camera->SetPosition(XMFLOAT3(0.0f, 5.0f, -40.0f));
 	
-	m_ModelManager->AddFromFile("data/models/podium.obj");
-	m_ModelManager->AddFromFile("data/models/piano.obj");
-
-
-	// Create the color shader object.
-	m_ColorShader = new ColorShaderClass;
-	if(!m_ColorShader)
-	{
+	m_ModelShader = new ModelShaderClass;
+	if(!m_ModelShader) {
 		return false;
 	}
-
-	// Initialize the color shader object.
-	result = m_ColorShader->Initialize(m_D3D->GetDevice(), hwnd);
-	if(!result)
-	{
+	result = m_ModelShader->Initialize(m_D3D->GetDevice(), hwnd);
+	if(!result)	{
 		MessageBox(hwnd, L"Could not initialize the color shader object.", L"Error", MB_OK);
 		return false;
 	}
-	/////////////
 
 	return true;
 }
 
-void GraphicsClass::Shutdown() {
-	if(m_Camera != nullptr) {
-		delete m_Camera;
-		m_Camera = nullptr;
-	}
-
-	if(m_D3D != nullptr) {
-		m_D3D->Shutdown();
-		delete m_D3D;
-	}
-
-	return;
+void CRenderer::Shutdown() {
+	SAFE_SHUTDOWN(m_ModelShader);
+	SAFE_SHUTDOWN(m_ModelManager);
+	SAFE_DELETE(m_Camera);
+	SAFE_SHUTDOWN(m_D3D);
 }
 
-bool GraphicsClass::Frame(int mx, int my, bool leftMouseDown, bool wheelForward, bool wheelBackward) {
-	static float campos = -15.0f;
+CModelManager* CRenderer::GetModelManager() {
+	return m_ModelManager;
+}
+
+int CRenderer::AddModel(const char* filename) {
+	return m_ModelManager->AddFromFile(m_D3D->GetDevice(), filename);
+}
+
+bool CRenderer::Frame(int mX, int mY, bool leftMouseDown, bool wheelForward, bool wheelBackward) {
+	static float camdist = -40.0f;
 	if(wheelForward) {
-		campos += 0.5f;
+		camdist += 0.5f;
 	}
 	else if(wheelBackward) {
-		campos -= 0.5f;
+		camdist -= 0.5f;
 	}
-
-
+	
 	/*
 	float a1 = -(float)x * 0.005;
 	float a2 = (float)y * 0.005;
@@ -97,15 +88,27 @@ bool GraphicsClass::Frame(int mx, int my, bool leftMouseDown, bool wheelForward,
 	vector3 rotation_axis = v3_normalize(v3_cross( v3_sub(cam->position, cam->target) , v3(0,1,0) ));
 
 	cam->position = m33_mul_v3(m33_rotation_axis_angle(rotation_axis, a2 ), cam->position );*/
-	XMVECTOR pos = m_Camera->GetPosition();
-	float x = XMVectorGetX(pos);
-	float y = XMVectorGetY(pos);
+	static int lastmx = 0;
+	static int lastmy = 0;
+	int deltamx = lastmx - mX;
+	int deltamy = lastmy - mY;
+	lastmx = mX;
+	lastmy = mY;
+
+	XMFLOAT3 pos = m_Camera->GetPosition();
+	XMFLOAT3 rot = m_Camera->GetRotation();
+	pos.z = camdist;
 	if(leftMouseDown) {
-		x += (mx * 0.001f);
-		y -= (my * 0.001f);
+		pos.x += (deltamx * 0.025f);
+		pos.y -= (deltamy * 0.025f);
 	}
 	
-	m_Camera->SetPosition(x, y, campos);
+	m_Camera->SetPosition(pos);
+	m_Camera->SetRotation(rot);
+
+	static float i = 0.0f;
+	i += 0.01f;
+	m_ModelManager->GetModel(1)->SetRotation(DirectX::XMFLOAT3(0.0f, i, 0.0f));
 
 	bool result = Render();
 	if(!result) {
@@ -115,35 +118,36 @@ bool GraphicsClass::Frame(int mx, int my, bool leftMouseDown, bool wheelForward,
 	return true;
 }
 
-bool GraphicsClass::Render() {
+bool CRenderer::Render() {
 	m_D3D->BeginScene(0.3f, 0.3f, 0.3f, 1.0f);
 
 	m_Camera->Render();
 
 	XMMATRIX viewMatrix;
-	m_Camera->GetViewMatrix(viewMatrix);
 	XMMATRIX projectionMatrix;
-	m_D3D->GetProjectionMatrix(projectionMatrix);
 	XMMATRIX worldMatrix;
-	m_D3D->GetWorldMatrix(worldMatrix);
-	XMMATRIX translateMatrix;
 
-	ModelClass* Model = m_ModelManager->GetModel(0);
-	Model->Render(m_D3D->GetDeviceContext());
-	if(!m_ColorShader->Render(m_D3D->GetDeviceContext(), Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix)) {
-		return false;
-	}
+	int numModels = m_ModelManager->GetModelCount();
+	CModel* model = nullptr;
+	XMFLOAT3 rotation;
+	for(int i = 0; i < numModels; ++i) {
+		model = m_ModelManager->GetModel(i);
+		rotation = model->GetRotation();
 
-	m_D3D->GetWorldMatrix(worldMatrix);
-	m_D3D->GetProjectionMatrix(projectionMatrix);
-	m_Camera->GetViewMatrix(viewMatrix);
-	translateMatrix = XMMatrixTranslation(0.0f, 5.0f, 0.0f);
-	worldMatrix = XMMatrixMultiply(worldMatrix, translateMatrix);
-
-	Model = m_ModelManager->GetModel(1);
-	Model->Render(m_D3D->GetDeviceContext());
-	if(!m_ColorShader->Render(m_D3D->GetDeviceContext(), Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix)) {
-		return false;
+		viewMatrix = m_Camera->GetViewMatrix();
+		m_D3D->GetProjectionMatrix(projectionMatrix);
+		m_D3D->GetWorldMatrix(worldMatrix);
+		
+		worldMatrix = XMMatrixScalingFromVector(XMLoadFloat3(&model->GetScale()));
+		worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslationFromVector(XMLoadFloat3(&model->GetPosition())));				
+		worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixRotationX(rotation.x));
+		worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixRotationY(rotation.y));
+		worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixRotationZ(rotation.z));
+		
+		model->Render(m_D3D->GetDeviceContext());
+		if(!m_ModelShader->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix)) {
+			return false;
+		}
 	}
 
 	m_D3D->EndScene();

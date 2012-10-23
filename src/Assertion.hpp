@@ -17,6 +17,7 @@
 
 	#ifdef USE_CUSTOM_ASSERTS
 
+#if 0
 		//#include <iostream>
 		__forceinline void assertion_failed(char const* expr, const char* func, const char* file, const int line) {
 			//std::cout << "Assertion (" << expr << ") failed in " << func << " : " << file << " (" << line << ')' << std::endl; //todo: eventually switch this to the customized printf.
@@ -25,8 +26,15 @@
 			#endif //_DEBUG
 		}
 		#define RL_ASSERT(_EXPR, _MSG) ((_EXPR) ? ((void)0) : assertion_failed(_MSG, __FUNCTION__, __FILE__, __LINE__))
+#endif //0
 
-	#else
+		#ifdef RL_DEBUG
+			#define RL_ASSERT(_EXPR, _MSG) ((_EXPR) ? ((void)0) : __debugbreak())
+		#else //RL_DEBUG
+			#define RL_ASSERT(_EXPR, _MSG) ((void)0)
+		#endif //RL_DEBUG
+
+	#else //USE_CUSTOM_ASSERTS
 
 		#include <assert.h>
 		#define RL_ASSERT(_EXPR, _MSG) assert(_EXPR)

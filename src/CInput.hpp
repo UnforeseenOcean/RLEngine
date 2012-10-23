@@ -7,17 +7,17 @@
 
 #include <dinput.h>
 
-class InputClass {
+class CInput {
 public:
-	InputClass();
-	InputClass(const InputClass&);
-	~InputClass();
+	CInput();
+	CInput(const CInput&);
+	~CInput();
 
-	bool Initialize(HINSTANCE, HWND, int, int);
+	bool Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeight);
 	void Shutdown();
 	bool Frame();
 
-	void GetMouseLocation(int&, int&);
+	void GetMouseLocation(int& mouseX, int& mouseY);
 
 	bool IsEscapePressed();
 	bool IsLeftArrowPressed();

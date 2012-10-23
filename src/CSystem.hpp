@@ -8,7 +8,7 @@
 #include "CRenderer.hpp"
 #include "CTimer.hpp"
 #include "CMouse.hpp"
-
+#include "CModelManager.hpp"
 
 class CSystem {
 public:
@@ -29,8 +29,8 @@ private:
 	LPCWSTR m_applicationName;
 	HINSTANCE m_hinstance;
 	CWindow* m_Window;
-	InputClass* m_Input;
-	GraphicsClass* m_Graphics;
-	TimerClass* m_Timer;
+	CTimer* m_Timer;
+	CRenderer* m_Renderer;
+	CInput* m_Input;
 	CMouse* m_Mouse;
 };

@@ -10,19 +10,23 @@ using namespace std;
 
 using namespace DirectX;
 
-ModelClass::ModelClass() {
+CModel::CModel() {
 	m_vertexBuffer = nullptr;
 	m_indexBuffer = nullptr;
 	m_Mesh = nullptr;
+
+	m_Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	m_Rotation = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	m_Scale = XMFLOAT3(1.0f, 1.0f, 1.0f);
 }
 
-ModelClass::ModelClass(const ModelClass& other) {
+CModel::CModel(const CModel&) {
 }
 
-ModelClass::~ModelClass() {
+CModel::~CModel() {
 }
 
-bool ModelClass::Initialize(ID3D11Device* device, const char* modelFileName) {
+bool CModel::Initialize(ID3D11Device* device, const char* modelFileName) {
 	bool result;
 
 	result = LoadObj(modelFileName);
@@ -38,7 +42,7 @@ bool ModelClass::Initialize(ID3D11Device* device, const char* modelFileName) {
 	return true;
 }
 
-void ModelClass::Shutdown() {
+void CModel::Shutdown() {
 	ShutdownBuffers();
 	
 	ReleaseModel();
@@ -46,17 +50,17 @@ void ModelClass::Shutdown() {
 	return;
 }
 
-void ModelClass::Render(ID3D11DeviceContext* deviceContext) {
+void CModel::Render(ID3D11DeviceContext* deviceContext) {
 	RenderBuffers(deviceContext);
 
 	return;
 }
 
-int ModelClass::GetIndexCount() {
+int CModel::GetIndexCount() {
 	return m_indexCount;
 }
 
-bool ModelClass::InitializeBuffers(ID3D11Device* device) {	
+bool CModel::InitializeBuffers(ID3D11Device* device) {	
 	VertexType* vertices = new (nothrow) VertexType[m_vertexCount];
 	if(vertices == nullptr) {
 		return false;
@@ -115,14 +119,14 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device) {
 	return true;
 }
 
-void ModelClass::ShutdownBuffers() {
+void CModel::ShutdownBuffers() {
 	SAFE_RELEASE(m_indexBuffer);
 	SAFE_RELEASE(m_vertexBuffer);
 
 	return;
 }
 
-void ModelClass::RenderBuffers(ID3D11DeviceContext* deviceContext) {
+void CModel::RenderBuffers(ID3D11DeviceContext* deviceContext) {
 	unsigned int stride = sizeof(VertexType);
 	unsigned int offset = 0;
     
@@ -133,7 +137,31 @@ void ModelClass::RenderBuffers(ID3D11DeviceContext* deviceContext) {
 	return;
 }
 
-bool ModelClass::LoadObj(const char* filename) {
+void CModel::SetPosition(DirectX::XMFLOAT3 pos) {
+	m_Position = pos;
+}
+
+DirectX::XMFLOAT3 CModel::GetPosition() {
+	return m_Position;
+}
+
+void CModel::SetRotation(DirectX::XMFLOAT3 rot) {
+	m_Rotation = rot;
+}
+
+DirectX::XMFLOAT3 CModel::GetRotation() {
+	return m_Rotation;
+}
+
+void CModel::SetScale(DirectX::XMFLOAT3 scale) {
+	m_Scale = scale;
+}
+
+DirectX::XMFLOAT3 CModel::GetScale() {
+	return m_Scale;
+}
+
+bool CModel::LoadObj(const char* filename) {
 	typedef struct {
 		float x, y, z;
 	}VertType;
@@ -168,10 +196,6 @@ bool ModelClass::LoadObj(const char* filename) {
 
 		while((token = lexer.ReadToken()) != nullptr) {
 			string = token->GetString();
-			if(strncmp(string, "#", 1) == 0) {
-				Console::Print(string);
-			}
-
 			if(strcmp(string, "v") == 0) {
 				VertType verticie;
 				verticie.x = lexer.ReadFloat();
@@ -298,7 +322,7 @@ bool ModelClass::LoadObj(const char* filename) {
 	return true;
 }
 
-void ModelClass::ReleaseModel() {
+void CModel::ReleaseModel() {
 	SAFE_DELETE(m_Mesh);
 
 	return;

@@ -6,7 +6,7 @@
 #include <fstream>
 using namespace std;
 
-class ColorShaderClass {
+class ModelShaderClass {
 private:
 	struct MatrixBufferType {
 		DirectX::XMMATRIX world;
@@ -15,9 +15,9 @@ private:
 	};
 
 public:
-	ColorShaderClass();
-	ColorShaderClass(const ColorShaderClass&);
-	~ColorShaderClass();
+	ModelShaderClass();
+	ModelShaderClass(const ModelShaderClass&);
+	~ModelShaderClass();
 
 	bool Initialize(ID3D11Device*, HWND);
 	void Shutdown();

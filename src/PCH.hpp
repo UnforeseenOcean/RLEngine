@@ -4,6 +4,7 @@
 
 #include <new>
 #include <cstdint>
+#include <DirectXMath.h>
 
 using std::nothrow;
 
@@ -23,6 +24,6 @@ using std::nothrow;
 #endif
 
 #define SAFE_DELETE(__ptr__) RL_ASSERT(__ptr__ != nullptr, "Double-Deleted a pointer!"); delete __ptr__; __ptr__ = nullptr
-#define SAFE_DELETE_ARRAY(__ptr__) RL_ASSERT(__ptr__ != nullptr, "Double-Deleted a pointer!"); delete[] __ptr__; __ptr__ = nullptr
-#define SAFE_SHUTDOWN(__ptr__) RL_ASSERT(__ptr__ != nullptr, "Double-Deleted a pointer!"); __ptr__->Shutdown(); delete __ptr__; __ptr__ = nullptr
-#define SAFE_RELEASE(__ptr__) RL_ASSERT(__ptr__ != nullptr, "Double-Deleted a pointer!"); __ptr__->Release(); delete __ptr__; __ptr__ = nullptr
+#define SAFE_DELETE_ARRAY(__ptr__) RL_ASSERT(__ptr__ != nullptr, "Double-Deleted a pointer array!"); delete[] __ptr__; __ptr__ = nullptr
+#define SAFE_SHUTDOWN(__ptr__) RL_ASSERT(__ptr__ != nullptr, "Double-Shutdown a pointer!"); __ptr__->Shutdown(); delete __ptr__; __ptr__ = nullptr
+#define SAFE_RELEASE(__ptr__) RL_ASSERT(__ptr__ != nullptr, "Double-Released a pointer!"); __ptr__->Release(); __ptr__ = nullptr

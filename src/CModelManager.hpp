@@ -1,6 +1,6 @@
 #pragma once
 
-class ModelClass;
+class CModel;
 struct ID3D11Device;
 
 class CModelManager {
@@ -14,14 +14,15 @@ public:
 	CModelManager(const CModelManager&);
 	~CModelManager();
 
-	bool Init(ID3D11Device* device);
+	bool Init();
 	void Shutdown();
 
-	int AddFromFile(char *filename);
-	ModelClass* GetModel(int modelID);
+	int AddFromFile(ID3D11Device* device, const char *filename);
+	CModel* GetModel(int modelID);
+	//ModelClass** GetModels();
+	int GetModelCount();
 
 private:
-	ID3D11Device* m_pDevice;	
-	ModelClass* m_pModel[32];
+	CModel* m_pModel[32];
 	int m_iNumMeshes;
 };
