@@ -19,6 +19,6 @@ public:
 private:
 	DirectX::XMFLOAT3 m_Position;
 	DirectX::XMFLOAT3 m_Rotation;
-	DirectX::XMMATRIX m_viewMatrix;
+	DirectX::XMFLOAT4X4 m_viewMatrix;
 	// AR, FoV, zNear, zFar
 };

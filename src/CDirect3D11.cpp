@@ -25,15 +25,9 @@ bool CDirect3D11::Initialize(int screenWidth, int screenHeight, bool vsync, HWND
 	HRESULT result;
 	IDXGIFactory* factory;
 	IDXGIAdapter* adapter;
-	IDXGIOutput* adapterOutput;
-
-	unsigned int stringLength;
-
+	IDXGIOutput* adapterOutput;	
 	DXGI_MODE_DESC* displayModeList;
-	DXGI_ADAPTER_DESC adapterDesc;
-
-	int error;
-
+	DXGI_ADAPTER_DESC adapterDesc;	
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
 	ID3D11Texture2D* backBufferPtr;
 	D3D11_TEXTURE2D_DESC depthBufferDesc;
@@ -44,6 +38,8 @@ bool CDirect3D11::Initialize(int screenWidth, int screenHeight, bool vsync, HWND
 	float screenAspect;
 	D3D11_DEPTH_STENCIL_DESC depthDisabledStencilDesc;
 	D3D11_BLEND_DESC blendStateDescription;
+
+	Console::Print("Initializing Direct3D.");
 
 	m_vsync_enabled = vsync;
 
@@ -96,7 +92,9 @@ bool CDirect3D11::Initialize(int screenWidth, int screenHeight, bool vsync, HWND
 
 	m_videoCardMemory = adapterDesc.DedicatedVideoMemory / 1024 / 1024;
 
-	error = wcstombs_s(&stringLength, m_videoCardDescription, 128, adapterDesc.Description, 128);
+
+	unsigned int stringLength;
+	errno_t error = wcstombs_s(&stringLength, m_videoCardDescription, 128, adapterDesc.Description, 128);
 	if(error != 0) {
 		return false;
 	}
@@ -217,11 +215,9 @@ bool CDirect3D11::Initialize(int screenWidth, int screenHeight, bool vsync, HWND
 	fieldOfView = (float)XM_PI / 4.0f;
 	screenAspect = (float)screenWidth / (float)screenHeight;
 
-	m_projectionMatrix = XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth);
-
-	m_worldMatrix = XMMatrixIdentity();
-
-	m_orthoMatrix = XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth);
+	XMStoreFloat4x4(&m_projectionMatrix, XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth));
+	XMStoreFloat4x4(&m_worldMatrix, XMMatrixIdentity());
+	XMStoreFloat4x4(&m_orthoMatrix, XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth));
 
 	ZeroMemory(&depthDisabledStencilDesc, sizeof(depthDisabledStencilDesc));
 	depthStencilDesc.DepthEnable = false;
@@ -272,53 +268,21 @@ void CDirect3D11::Shutdown() {
 		m_swapChain->SetFullscreenState(false, nullptr);
 	}
 
-	if(m_alphaEnableBlendingState != nullptr) {
-		m_alphaEnableBlendingState->Release();
-	}
-
-	if(m_alphaDisableBlendingState != nullptr) {
-		m_alphaDisableBlendingState->Release();
-	}
-
-	if(m_depthDisabledStencilState != nullptr) {
-		m_depthDisabledStencilState->Release();
-	}
-
-	if(m_rasterState != nullptr) {
-		m_rasterState->Release();
-	}
-
-	if(m_depthStencilView != nullptr) {
-		m_depthStencilView->Release();
-	}
-
-	if(m_depthStencilState != nullptr) {
-		m_depthStencilState->Release();
-	}
-
-	if(m_depthStencilBuffer != nullptr) {
-		m_depthStencilBuffer->Release();
-	}
-
-	if(m_renderTargetView != nullptr) {
-		m_renderTargetView->Release();
-	}
-
-	if(m_deviceContext != nullptr) {
-		m_deviceContext->Release();
-	}
-
-	if(m_device != nullptr) {
-		m_device->Release();
-	}
-
-	if(m_swapChain != nullptr) {
-		m_swapChain->Release();
-	}
+	SAFE_RELEASE(m_alphaEnableBlendingState);
+	SAFE_RELEASE(m_alphaDisableBlendingState);
+	SAFE_RELEASE(m_depthDisabledStencilState);
+	SAFE_RELEASE(m_rasterState);
+	SAFE_RELEASE(m_depthStencilView);
+	SAFE_RELEASE(m_depthStencilState);
+	SAFE_RELEASE(m_depthStencilBuffer);
+	SAFE_RELEASE(m_renderTargetView);
+	SAFE_RELEASE(m_deviceContext);
+	SAFE_RELEASE(m_device);
+	SAFE_RELEASE(m_swapChain);
 }
 
-void CDirect3D11::BeginScene(float red, float green, float blue, float alpha) {
-	float color[4] = { red, green, blue, alpha };
+void CDirect3D11::BeginScene(const float red, const float green, const float blue, const float alpha) {
+	const float color[4] = { red, green, blue, alpha };
 
 	m_deviceContext->ClearRenderTargetView(m_renderTargetView, color);
 	m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
@@ -341,16 +305,16 @@ ID3D11DeviceContext* CDirect3D11::GetDeviceContext() {
 	return m_deviceContext;
 }
 
-void CDirect3D11::GetProjectionMatrix(XMMATRIX& projectionMatrix) {
-	projectionMatrix = m_projectionMatrix;
+XMMATRIX CDirect3D11::GetProjectionMatrix() {
+	return XMLoadFloat4x4(&m_projectionMatrix);
 }
 
-void CDirect3D11::GetWorldMatrix(XMMATRIX& worldMatrix) {
-	worldMatrix = m_worldMatrix;
+XMMATRIX CDirect3D11::GetWorldMatrix() {
+	return XMLoadFloat4x4(&m_worldMatrix);
 }
 
-void CDirect3D11::GetOrthoMatrix(XMMATRIX& orthoMatrix) {
-	orthoMatrix = m_orthoMatrix;
+XMMATRIX CDirect3D11::GetOrthoMatrix() {
+	return XMLoadFloat4x4(&m_orthoMatrix);
 }
 
 void CDirect3D11::GetVideoCardInfo(char* cardName, int& memory) {

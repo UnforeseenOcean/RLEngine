@@ -29,23 +29,21 @@ XMFLOAT3 CCamera::GetRotation() {
 }
 
 void CCamera::Render() {
-	const float pitch = XMConvertToRadians(m_Rotation.x);
-	const float yaw = XMConvertToRadians(m_Rotation.y);
-	const float roll = XMConvertToRadians(m_Rotation.z);
-	const XMMATRIX rotationMatrix = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
+	const XMMATRIX rotationMatrix = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_Rotation.x), XMConvertToRadians(m_Rotation.y), XMConvertToRadians(m_Rotation.z));
 	const XMVECTOR position = XMLoadFloat3(&m_Position);
 	
-	XMVECTOR lookAt = XMLoadFloat3(&XMFLOAT3(0.0f, 0.0f, 1.0f));
+	const XMFLOAT3 lookAtTemp(0.0f, 0.0f, 1.0f);
+	XMVECTOR lookAt = XMLoadFloat3(&lookAtTemp);
 	lookAt = XMVector3TransformCoord(lookAt, rotationMatrix);
 	lookAt = position + lookAt;
 	
-	XMVECTOR up = XMLoadFloat3(&XMFLOAT3(0.0f, 1.0f, 0.0f));
+	const XMFLOAT3 upTemp(0.0f, 1.0f, 0.0f);
+	XMVECTOR up = XMLoadFloat3(&upTemp);
 	up = XMVector3TransformCoord(up, rotationMatrix);
 
-	
-	m_viewMatrix = XMMatrixLookAtLH(position, lookAt, up);
+	XMStoreFloat4x4(&m_viewMatrix, XMMatrixLookAtLH(position, lookAt, up));
 }
 
 XMMATRIX CCamera::GetViewMatrix() {
-	return m_viewMatrix;
+	return XMLoadFloat4x4(&m_viewMatrix);
 }

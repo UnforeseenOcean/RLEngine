@@ -9,7 +9,6 @@
 #include <DirectXMath.h>
 
 using namespace DirectX;
-
 class CDirect3D11 {
 public:
 	CDirect3D11();
@@ -25,9 +24,9 @@ public:
 	ID3D11Device* GetDevice();
 	ID3D11DeviceContext* GetDeviceContext();
 
-	void GetProjectionMatrix(XMMATRIX& projectionMatrix);
-	void GetWorldMatrix(XMMATRIX& worldMatrix);
-	void GetOrthoMatrix(XMMATRIX& orthoMatrix);
+	XMMATRIX GetProjectionMatrix();
+	XMMATRIX GetWorldMatrix();
+	XMMATRIX GetOrthoMatrix();
 
 	void GetVideoCardInfo(char* cardName, int& memory);
 
@@ -45,9 +44,9 @@ private:
 	bool m_vsync_enabled;
 	size_t m_videoCardMemory;
 	char m_videoCardDescription[128];
-	XMMATRIX m_projectionMatrix;
-	XMMATRIX m_worldMatrix;
-	XMMATRIX m_orthoMatrix;
+	XMFLOAT4X4 m_projectionMatrix;
+	XMFLOAT4X4 m_worldMatrix;
+	XMFLOAT4X4 m_orthoMatrix;
 	IDXGISwapChain* m_swapChain;
 	ID3D11Device* m_device;
 	ID3D11DeviceContext* m_deviceContext;

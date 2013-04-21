@@ -16,6 +16,8 @@ CRenderer::~CRenderer() {
 }
 
 bool CRenderer::Initialize(HWND hwnd, int screenWidth, int screenHeight, bool fullscreen) {
+	Console::Print("Initializing Renderer.");
+
 	m_D3D = new CDirect3D11;
 	if(m_D3D == nullptr) {
 		return false;
@@ -135,8 +137,8 @@ bool CRenderer::Render() {
 		rotation = model->GetRotation();
 
 		viewMatrix = m_Camera->GetViewMatrix();
-		m_D3D->GetProjectionMatrix(projectionMatrix);
-		m_D3D->GetWorldMatrix(worldMatrix);
+		projectionMatrix = m_D3D->GetProjectionMatrix();
+		worldMatrix = m_D3D->GetWorldMatrix();
 		
 		worldMatrix = XMMatrixScalingFromVector(XMLoadFloat3(&model->GetScale()));
 		worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslationFromVector(XMLoadFloat3(&model->GetPosition())));				
