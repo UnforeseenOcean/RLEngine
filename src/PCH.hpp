@@ -3,10 +3,9 @@
 #pragma message("Creating precompiled header.\n")
 
 #include <new>
-#include <cstdint>
 #include <DirectXMath.h>
 
-using std::nothrow;
+using std::nothrow; //from new
 
 #include "Assertion.hpp"
 #include "ConVar.hpp"
