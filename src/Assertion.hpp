@@ -22,14 +22,14 @@
 		__forceinline void assertion_failed(char const* expr, const char* func, const char* file, const int line) {
 			//std::cout << "Assertion (" << expr << ") failed in " << func << " : " << file << " (" << line << ')' << std::endl; //todo: eventually switch this to the customized printf.
 			#ifdef _DEBUG
-				__debugbreak();
+				RL_DEBUGBREAK;
 			#endif //_DEBUG
 		}
 		#define RL_ASSERT(_EXPR, _MSG) ((_EXPR) ? ((void)0) : assertion_failed(_MSG, __FUNCTION__, __FILE__, __LINE__))
 #endif //0
 
 		#ifdef RL_DEBUG
-			#define RL_ASSERT(_EXPR, _MSG) ((_EXPR) ? ((void)0) : __debugbreak())
+			#define RL_ASSERT(_EXPR, _MSG) ((_EXPR) ? ((void)0) : RL_DEBUGBREAK)
 		#else //RL_DEBUG
 			#define RL_ASSERT(_EXPR, _MSG) ((void)0)
 		#endif //RL_DEBUG
