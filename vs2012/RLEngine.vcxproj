@@ -90,6 +90,7 @@
     <ClCompile Include="..\src\CModelManager.cpp" />
     <ClCompile Include="..\src\CMouse.cpp" />
     <ClCompile Include="..\src\Console.cpp" />
+    <ClCompile Include="..\src\ConVar.cpp" />
     <ClCompile Include="..\src\CRenderer.cpp" />
     <ClCompile Include="..\src\CSystem.cpp" />
     <ClCompile Include="..\src\CTimer.cpp" />

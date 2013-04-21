@@ -2,12 +2,12 @@
 
 class ConVar {
 public:
-	inline ConVar(const char* name, const char* description, int value) : m_name(name), m_description(description), m_value(value), m_min(INT32_MIN), m_max(INT32_MAX) {
+	inline ConVar(const char* name, const char* description, int value) : m_value(value), m_name(name), m_description(description), m_min(INT32_MIN), m_max(INT32_MAX) {
 		AddToList();
 	}
 
 	inline ConVar(const char* name, const char* description, const int value, const int min, const int max) :
-	m_name(name), m_description(description), m_value(value), m_min(min), m_max(max) {
+	m_value(value), m_name(name), m_description(description), m_min(min), m_max(max) {
 		RL_ASSERT(min <= max, "Minimum value must be greater than the maximum.");
 		RL_ASSERT(value >= min && value <= max, "The value must be between the minimum and maximum values!");
 		AddToList();
@@ -29,8 +29,22 @@ public:
 		return m_value;
 	}
 
+	inline const char* GetName() {
+		return m_name;
+	}
+
+	inline const char* GetDesc() {
+		return m_description;
+	}
+
+	inline ConVar* GetNextConvar() {
+		return m_next;
+	}
+
+	static ConVar* GetHead();
+
 private:
-	inline void AddToList();
+	void AddToList();
 
 	ConVar* m_next;
 	int m_value;
@@ -39,19 +53,3 @@ private:
 	const int m_min;
 	const int m_max;
 };
-
-namespace _Internal_ConVar {
-	static ConVar* head = nullptr;
-	static ConVar* tail = nullptr;
-}
-
-void ConVar::AddToList() {
-	if(_Internal_ConVar::head != nullptr) {
-		_Internal_ConVar::tail->m_next = this;
-		_Internal_ConVar::tail = this;
-	}
-	else {
-		_Internal_ConVar::head = this;
-		_Internal_ConVar::tail = this;
-	}
-}
