@@ -23,13 +23,15 @@ CMouse::~CMouse() {
 }
 
 bool CMouse::Initialize(HWND hwnd) {
-	m_RawDevice[0].usUsagePage = 0x01; 
-	m_RawDevice[0].usUsage = HID_USAGE_GENERIC_MOUSE; 
-	m_RawDevice[0].dwFlags = RIDEV_NOLEGACY; // adds HID mouse and also ignores legacy mouse messages
+	Console::Print("Initializing Raw Mouse Input.");
+
+	m_RawDevice[0].usUsagePage = 0x01;
+	m_RawDevice[0].usUsage = HID_USAGE_GENERIC_MOUSE;
+	m_RawDevice[0].dwFlags = 0;
 	m_RawDevice[0].hwndTarget = hwnd;
 
 	if (RegisterRawInputDevices(m_RawDevice, 1, sizeof(m_RawDevice[0])) == FALSE) {
-		//registration failed. Call GetLastError for the cause of the error
+		Console::Print("Error in CMouse::Initialize RegisterRawInputDevices! - GLE: %u", GetLastError());
 		return false;
 	}
 
