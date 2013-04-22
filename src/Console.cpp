@@ -4,6 +4,8 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <cstdio>
+#include <chrono>
+#include <ctime>
 
 HANDLE Console::m_hWindowsConsole = INVALID_HANDLE_VALUE;
 HANDLE Console::m_LogFile = INVALID_HANDLE_VALUE;
@@ -54,6 +56,8 @@ bool Console::Initialize() {
 		return false;
 	}
 
+	Console::Print("Console Initialized.");
+
 	return true;
 }
 
@@ -71,20 +75,35 @@ void Console::Shutdown() {
 	return;
 }
 
-void Console::Print(const char* message) {
+void Console::Print(const char* const format, ...) {
 	if(m_Console == nullptr) {
 		RL_DEBUGBREAK();
 		return;
 	}
 
-	WriteConsoleA(m_hWindowsConsole, message, strnlen_s(message, 1024), nullptr, nullptr);
-	WriteConsoleA(m_hWindowsConsole, "\n", 1, nullptr, nullptr);
-	//printf("%s\n", message);
-
+	char buffer[1024];
 	DWORD nBytesToWrite = 0;
-	//TODO: Add Time to this.
-	WriteFile(m_LogFile, message, strnlen_s(message, 1024), &nBytesToWrite, NULL);
-	WriteFile(m_LogFile, "\r\n", 2, &nBytesToWrite, NULL);
+
+	std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+	strftime(buffer, sizeof(buffer), "%X", gmtime(&t));
+	WriteConsoleA(m_hWindowsConsole, buffer, strnlen_s(buffer, 1024), nullptr, nullptr);
+	WriteConsoleA(m_hWindowsConsole, " ", 1, nullptr, nullptr);
+
+	WriteFile(m_LogFile, buffer, strnlen_s(buffer, 1024), &nBytesToWrite, NULL);
+	WriteFile(m_LogFile, " ", 1, &nBytesToWrite, NULL);
+
+
+	va_list val;
+	va_start(val, format);
+	//int ret =
+	vsprintf_s(buffer, format, val); //todo: Overflow protection, look at doom3's code.
+	va_end(val);
+
+	WriteConsoleA(m_hWindowsConsole, buffer, strnlen_s(buffer, 1024), nullptr, nullptr);
+	WriteConsoleA(m_hWindowsConsole, "\n", 1, nullptr, nullptr);
+
+	WriteFile(m_LogFile, buffer, strnlen_s(buffer, 1024), &nBytesToWrite, NULL);
+	WriteFile(m_LogFile, "\n", 1, &nBytesToWrite, NULL);
 	
 	return;
 }

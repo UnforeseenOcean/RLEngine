@@ -5,7 +5,7 @@ public:
 	static bool Initialize();
 	static void Shutdown();
 
-	static void Print(const char* message);
+	static void Print(const char* message, ...);
 	
 protected:
 	Console();
