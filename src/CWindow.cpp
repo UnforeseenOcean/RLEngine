@@ -18,6 +18,8 @@ CWindow::~CWindow() {
 }
 
 bool CWindow::Initialize(HINSTANCE hInstance, const wchar_t* wszTitle, CSystem* parent) {
+	Console::Print("Initializing Window.");
+
 	Parent = parent;
 	m_Type = g_WindowType;
 	WNDCLASSEX wc;

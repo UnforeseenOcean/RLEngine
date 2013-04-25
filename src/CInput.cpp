@@ -16,6 +16,8 @@ CInput::~CInput() {
 bool CInput::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeight) {
 	HRESULT result;
 
+	Console::Print("Initializing Input.");
+
 	m_screenWidth = screenWidth;
 	m_screenHeight = screenHeight;
 

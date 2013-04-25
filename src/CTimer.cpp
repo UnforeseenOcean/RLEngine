@@ -11,6 +11,8 @@ CTimer::~CTimer() {
 }
 
 bool CTimer::Initialize() {
+	Console::Print("Initializing Timer.");
+
 	QueryPerformanceFrequency((LARGE_INTEGER*)&m_frequency);
 	if(m_frequency == 0) {
 		return false;

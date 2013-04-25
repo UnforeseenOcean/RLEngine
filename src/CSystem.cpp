@@ -18,6 +18,8 @@ CSystem::~CSystem() {
 }
 
 bool CSystem::Initialize() {
+	Console::Print("Initializing System.");
+
 	if(CSystem::ApplicationHandle != nullptr) {
 		return false;
 	}
