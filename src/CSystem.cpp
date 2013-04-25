@@ -119,11 +119,8 @@ void CSystem::Shutdown() {
 }
 
 void CSystem::Run() {
-	MSG msg;
+	MSG msg = {};
 	bool result;
-
-	ZeroMemory(&msg, sizeof(MSG));
-
 	bool done = false;
 	while(!done) {
 		while(PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
@@ -182,10 +179,9 @@ LRESULT CSystem::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lpar
 		{
 			unsigned int rawInputSize = sizeof(RAWINPUT);
 			static BYTE lpb[sizeof(RAWINPUT)];
-			unsigned result = GetRawInputData((HRAWINPUT)lparam, RID_INPUT, lpb, &rawInputSize, sizeof(RAWINPUTHEADER));
+			unsigned int result = GetRawInputData((HRAWINPUT)lparam, RID_INPUT, lpb, &rawInputSize, sizeof(RAWINPUTHEADER));
 			if(result == 0xFFFFFFFF) {
-				//bprintf("Error in GetRawInputData - GLE: %u, Size: %u\n", GetLastError(), sizeof(RAWINPUT) );
-				Console::Print("Error in GetRawInputData!");
+				Console::Print("Error in GetRawInputData! - GLE: %u", GetLastError());
 				PostQuitMessage(1);
 				break;
 			}
