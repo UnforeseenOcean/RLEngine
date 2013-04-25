@@ -15,7 +15,8 @@
   </PropertyGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{BE7571F7-7E78-4C24-BA63-8895AE30F648}</ProjectGuid>
-    <RootNamespace>RLEngine</RootNamespace>
+    <RootNamespace>Core</RootNamespace>
+    <ProjectName>Core</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -83,57 +84,44 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\CCamera.cpp" />
-    <ClCompile Include="..\src\CDirect3D11.cpp" />
-    <ClCompile Include="..\src\CInput.cpp" />
-    <ClCompile Include="..\src\CModel.cpp" />
-    <ClCompile Include="..\src\CModelManager.cpp" />
-    <ClCompile Include="..\src\CMouse.cpp" />
-    <ClCompile Include="..\src\Console.cpp" />
-    <ClCompile Include="..\src\ConVar.cpp" />
-    <ClCompile Include="..\src\CRenderer.cpp" />
-    <ClCompile Include="..\src\CSystem.cpp" />
-    <ClCompile Include="..\src\CTimer.cpp" />
-    <ClCompile Include="..\src\CWindow.cpp" />
-    <ClCompile Include="..\src\Lexer.cpp" />
-    <ClCompile Include="..\src\main.cpp" />
-    <ClCompile Include="..\src\PCH.cpp">
+    <ClCompile Include="..\..\src\CCamera.cpp" />
+    <ClCompile Include="..\..\src\CDirect3D11.cpp" />
+    <ClCompile Include="..\..\src\CInput.cpp" />
+    <ClCompile Include="..\..\src\CModel.cpp" />
+    <ClCompile Include="..\..\src\CModelManager.cpp" />
+    <ClCompile Include="..\..\src\CMouse.cpp" />
+    <ClCompile Include="..\..\src\Console.cpp" />
+    <ClCompile Include="..\..\src\ConVar.cpp" />
+    <ClCompile Include="..\..\src\CRenderer.cpp" />
+    <ClCompile Include="..\..\src\CSystem.cpp" />
+    <ClCompile Include="..\..\src\CTimer.cpp" />
+    <ClCompile Include="..\..\src\CWindow.cpp" />
+    <ClCompile Include="..\..\src\Lexer.cpp" />
+    <ClCompile Include="..\..\src\main.cpp" />
+    <ClCompile Include="..\..\src\PCH.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">PCH.hpp</PrecompiledHeaderFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\src\Shader.cpp" />
+    <ClCompile Include="..\..\src\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\Assertion.hpp" />
-    <ClInclude Include="..\src\CCamera.hpp" />
-    <ClInclude Include="..\src\CModel.hpp" />
-    <ClInclude Include="..\src\CModelManager.hpp" />
-    <ClInclude Include="..\src\CMouse.hpp" />
-    <ClInclude Include="..\src\Console.hpp" />
-    <ClInclude Include="..\src\ConVar.hpp" />
-    <ClInclude Include="..\src\CDirect3D11.hpp" />
-    <ClInclude Include="..\src\CInput.hpp" />
-    <ClInclude Include="..\src\CRenderer.hpp" />
-    <ClInclude Include="..\src\CSystem.hpp" />
-    <ClInclude Include="..\src\CTimer.hpp" />
-    <ClInclude Include="..\src\CWindow.hpp" />
-    <ClInclude Include="..\src\Lexer.hpp" />
-    <ClInclude Include="..\src\PCH.hpp" />
-    <ClInclude Include="..\src\Shader.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="..\shaders\PixelShader.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="..\shaders\VertexShader.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
-    </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram.cd" />
+    <ClInclude Include="..\..\src\Assertion.hpp" />
+    <ClInclude Include="..\..\src\CCamera.hpp" />
+    <ClInclude Include="..\..\src\CModel.hpp" />
+    <ClInclude Include="..\..\src\CModelManager.hpp" />
+    <ClInclude Include="..\..\src\CMouse.hpp" />
+    <ClInclude Include="..\..\src\Console.hpp" />
+    <ClInclude Include="..\..\src\ConVar.hpp" />
+    <ClInclude Include="..\..\src\CDirect3D11.hpp" />
+    <ClInclude Include="..\..\src\CInput.hpp" />
+    <ClInclude Include="..\..\src\CRenderer.hpp" />
+    <ClInclude Include="..\..\src\CSystem.hpp" />
+    <ClInclude Include="..\..\src\CTimer.hpp" />
+    <ClInclude Include="..\..\src\CWindow.hpp" />
+    <ClInclude Include="..\..\src\Lexer.hpp" />
+    <ClInclude Include="..\..\src\PCH.hpp" />
+    <ClInclude Include="..\..\src\Shader.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
