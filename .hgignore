@@ -2,7 +2,7 @@ syntax: glob
 */[Dd]ebug/
 */[Rr]elease/
 */ipch/
-*.sdf
+*.*sdf
 *.suo
 *.vcxproj.user
 lastrun.log
