@@ -1,4 +1,4 @@
-#include "PCH.hpp"
+#include "Core.hpp"
 
 namespace _ConVar_Internal {
 	static ConVar* head = nullptr;

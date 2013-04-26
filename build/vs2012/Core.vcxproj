@@ -49,7 +49,7 @@
       <Optimization>Disabled</Optimization>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>PCH.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>Core.hpp</PrecompiledHeaderFile>
       <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
@@ -70,7 +70,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>PCH.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>Core.hpp</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
     </ClCompile>
@@ -97,8 +97,7 @@
     <ClCompile Include="..\..\src\CTimer.cpp" />
     <ClCompile Include="..\..\src\CWindow.cpp" />
     <ClCompile Include="..\..\src\Lexer.cpp" />
-    <ClCompile Include="..\..\src\main.cpp" />
-    <ClCompile Include="..\..\src\PCH.cpp">
+    <ClCompile Include="..\..\src\Core.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">PCH.hpp</PrecompiledHeaderFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -120,7 +119,7 @@
     <ClInclude Include="..\..\src\CTimer.hpp" />
     <ClInclude Include="..\..\src\CWindow.hpp" />
     <ClInclude Include="..\..\src\Lexer.hpp" />
-    <ClInclude Include="..\..\src\PCH.hpp" />
+    <ClInclude Include="..\..\src\Core.hpp" />
     <ClInclude Include="..\..\src\Shader.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

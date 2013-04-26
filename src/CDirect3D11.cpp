@@ -1,4 +1,4 @@
-#include "PCH.hpp"
+#include "Core.hpp"
 #include "CDirect3D11.hpp"
 
 CDirect3D11::CDirect3D11() {

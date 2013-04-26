@@ -1,4 +1,4 @@
-#include "PCH.hpp"
+#include "Core.hpp"
 #include "Lexer.hpp"
 
 #define WIN32_LEAN_AND_MEAN
