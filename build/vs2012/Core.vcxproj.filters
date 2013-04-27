@@ -38,7 +38,7 @@
     <ClCompile Include="..\..\src\Console.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\CWindow.cpp">
+    <ClCompile Include="..\..\src\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Lexer.cpp">
@@ -88,7 +88,7 @@
     <ClInclude Include="..\..\src\Console.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\CWindow.hpp">
+    <ClInclude Include="..\..\src\Core\Window.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Lexer.hpp">

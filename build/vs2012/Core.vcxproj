@@ -94,7 +94,7 @@
     <ClCompile Include="..\..\src\ConVar.cpp" />
     <ClCompile Include="..\..\src\CRenderer.cpp" />
     <ClCompile Include="..\..\src\CTimer.cpp" />
-    <ClCompile Include="..\..\src\CWindow.cpp" />
+    <ClCompile Include="..\..\src\Window.cpp" />
     <ClCompile Include="..\..\src\Lexer.cpp" />
     <ClCompile Include="..\..\src\Core.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">PCH.hpp</PrecompiledHeaderFile>
@@ -115,7 +115,7 @@
     <ClInclude Include="..\..\src\CInput.hpp" />
     <ClInclude Include="..\..\src\CRenderer.hpp" />
     <ClInclude Include="..\..\src\CTimer.hpp" />
-    <ClInclude Include="..\..\src\CWindow.hpp" />
+    <ClInclude Include="..\..\src\Core\Window.hpp" />
     <ClInclude Include="..\..\src\Lexer.hpp" />
     <ClInclude Include="..\..\src\Core.hpp" />
     <ClInclude Include="..\..\src\Shader.hpp" />

@@ -1,5 +1,5 @@
 #include "Core.hpp"
-#include "CWindow.hpp"
+#include "Core/Window.hpp"
 
 static ConVar g_ScreenWidth("ScreenWidth", "The Width of the rendering window", 1280, 0, INT32_MAX);
 static ConVar g_ScreenHeight("ScreenHeight", "The Height of the rendering window", 800, 0, INT32_MAX);
