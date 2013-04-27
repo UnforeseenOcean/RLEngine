@@ -93,7 +93,6 @@
     <ClCompile Include="..\..\src\Console.cpp" />
     <ClCompile Include="..\..\src\ConVar.cpp" />
     <ClCompile Include="..\..\src\CRenderer.cpp" />
-    <ClCompile Include="..\..\src\CSystem.cpp" />
     <ClCompile Include="..\..\src\CTimer.cpp" />
     <ClCompile Include="..\..\src\CWindow.cpp" />
     <ClCompile Include="..\..\src\Lexer.cpp" />
@@ -115,7 +114,6 @@
     <ClInclude Include="..\..\src\CDirect3D11.hpp" />
     <ClInclude Include="..\..\src\CInput.hpp" />
     <ClInclude Include="..\..\src\CRenderer.hpp" />
-    <ClInclude Include="..\..\src\CSystem.hpp" />
     <ClInclude Include="..\..\src\CTimer.hpp" />
     <ClInclude Include="..\..\src\CWindow.hpp" />
     <ClInclude Include="..\..\src\Lexer.hpp" />
