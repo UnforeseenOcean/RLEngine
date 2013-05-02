@@ -7,6 +7,7 @@
 
 using std::nothrow; //from new
 
+#include "Core/CoreModule.hpp"
 #include "Assertion.hpp"
 #include "ConVar.hpp"
 #include "Console.hpp"

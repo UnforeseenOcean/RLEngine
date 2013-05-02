@@ -92,6 +92,7 @@
     <ClCompile Include="..\..\src\CMouse.cpp" />
     <ClCompile Include="..\..\src\Console.cpp" />
     <ClCompile Include="..\..\src\ConVar.cpp" />
+    <ClCompile Include="..\..\src\CoreModule.cpp" />
     <ClCompile Include="..\..\src\CRenderer.cpp" />
     <ClCompile Include="..\..\src\CTimer.cpp" />
     <ClCompile Include="..\..\src\Window.cpp" />
@@ -114,6 +115,7 @@
     <ClInclude Include="..\..\src\CDirect3D11.hpp" />
     <ClInclude Include="..\..\src\CInput.hpp" />
     <ClInclude Include="..\..\src\Core\Containers\Pair.hpp" />
+    <ClInclude Include="..\..\src\Core\CoreModule.hpp" />
     <ClInclude Include="..\..\src\Core\Input\MouseButtons.hpp" />
     <ClInclude Include="..\..\src\CRenderer.hpp" />
     <ClInclude Include="..\..\src\CTimer.hpp" />
