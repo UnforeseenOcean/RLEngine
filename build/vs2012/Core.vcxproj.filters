@@ -9,6 +9,9 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="Header Files\Types">
+      <UniqueIdentifier>{7134c260-bb3f-413e-955f-d82847405c37}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\CInput.cpp">
@@ -100,5 +103,13 @@
     <ClInclude Include="..\..\src\Core.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Core\Containers\Pair.hpp">
+      <Filter>Header Files\Types</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\src\Core\Containers\Pair.inl">
+      <Filter>Header Files\Types</Filter>
+    </None>
   </ItemGroup>
 </Project>
