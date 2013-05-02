@@ -3,40 +3,58 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
-class CSystem;
+class CMouse;
 
-class CWindow {
+class Window {
 public:
-	struct Notification
-	{
-		enum Enum
-		{
-			CLOSE,
-			NONE
-		};
+	// Starts the window facility, and registers the window class.
+	// This is called automatically when starting the Core module.
+	static bool CoreStartup();
+
+	// Shuts down the window facility, and unregisters the window class.
+	// This is called automatically when shutting down the Core module.
+	static bool CoreShutdown();
+
+public:
+	enum class Mode {
+		FULLSCREEN,
+		WINDOWED,
+		NOBORDER
 	};
 
-	CWindow();
-	CWindow(const CWindow&);
-	~CWindow();
+	enum class Notification {
+		NONE,
+		CLOSE,
+	};
 
-	bool Initialize(HINSTANCE hInstance, const wchar_t* wszTitle);
+	Window();
+	~Window();
+
+	bool Initialize(const wchar_t* const name, int x, int y, unsigned int width, unsigned int height, Mode mode);
 	void Shutdown();
 
-	Notification::Enum PumpMessages() const;
+	void SetMouse(CMouse* mouse);
 
-	HWND GethWnd();
-	int GetWidth();
-	int GetHeight();
-	bool GetFullscreen();
+	Notification PumpMessages() const;
+
+	inline HWND GethWnd() const;
+	inline int GetWidth() const;
+	inline int GetHeight() const;
+	inline bool GetFullscreen() const;
 
 	// For Internal Use Only!
 	LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 private:
+	Window(const Window&);
+
 	HWND m_hWnd;
-	int m_Type;
+	Mode m_Mode;
 	int m_Width;
 	int m_Height;
 	int m_PosX;
 	int m_PosY;
+
+	CMouse* m_Mouse;
 };
+
+#include "Window.inl"

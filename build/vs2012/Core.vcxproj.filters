@@ -108,6 +108,9 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\src\Core\Window.inl">
+      <Filter>Header Files</Filter>
+    </None>
     <None Include="..\..\src\Core\Containers\Pair.inl">
       <Filter>Header Files\Types</Filter>
     </None>

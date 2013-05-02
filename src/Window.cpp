@@ -1,77 +1,91 @@
 #include "Core.hpp"
 #include "Core/Window.hpp"
-
-static ConVar g_ScreenWidth("ScreenWidth", "The Width of the rendering window", 1280, 0, INT32_MAX);
-static ConVar g_ScreenHeight("ScreenHeight", "The Height of the rendering window", 800, 0, INT32_MAX);
-static ConVar g_WindowType("ScreenType", "The Type of the rendering window", 1, 0, 2); // 0 = fullscreen, 1 = windowed, 2 = windowednoborder
+#include "CMouse.hpp"
 
 namespace {
-	LRESULT CALLBACK StaticWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-	{
-		CWindow* pParent;
+	bool g_WindowInitialized = false;
 
-		if(uMsg == WM_CREATE) {
-			pParent = (CWindow*)((LPCREATESTRUCT)lParam)->lpCreateParams;
-			LONG ret = SetWindowLongPtr(hWnd, GWL_USERDATA, (LONG_PTR)pParent);
+	LRESULT CALLBACK OnWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+		Window* window = reinterpret_cast<Window*>(GetWindowLongPtr(hWnd, GWL_USERDATA));
+		if(window) {
+			return window->WndProc(hWnd, uMsg, wParam, lParam);
 		}
 		else {
-			pParent = (CWindow*)GetWindowLongPtr(hWnd, GWL_USERDATA);
-			if(!pParent) {
-				return DefWindowProc(hWnd, uMsg, wParam, lParam);
-			}
+			return DefWindowProc(hWnd, uMsg, wParam, lParam);
+		}
+	}
+
+	LRESULT CALLBACK StaticWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+		if(uMsg == WM_CREATE) {
+			Window* window = reinterpret_cast<Window*>(reinterpret_cast<LPCREATESTRUCT>(lParam)->lpCreateParams);
+			SetWindowLongPtr(hWnd, GWL_USERDATA, reinterpret_cast<LONG_PTR>(window));
+			SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(OnWindowMessage));
+			return window->WndProc(hWnd, uMsg, wParam, lParam);
 		}
 
-		return pParent->WndProc(hWnd, uMsg, wParam, lParam);
+		return DefWindowProc(hWnd, uMsg, wParam, lParam);
 	}
 }
 
-
-CWindow::CWindow() {
-}
-
-CWindow::CWindow(const CWindow&) {
-}
-
-CWindow::~CWindow() {
-}
-
-bool CWindow::Initialize(HINSTANCE hInstance, const wchar_t* wszTitle) {
-	Console::Print("Initializing Window.");
-
-	m_Type = g_WindowType;
+bool Window::CoreStartup() {
+	RL_ASSERT(!g_WindowInitialized, "Window has already started up!");
+	
 	WNDCLASSEX wc;
-	wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-	wc.lpfnWndProc = StaticWndProc;
+	wc.cbSize = sizeof(WNDCLASSEX);
+	wc.style = 0;//CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+	wc.lpfnWndProc = StaticWindowProc;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
-	wc.hInstance = hInstance;
+	wc.hInstance = GetModuleHandle(nullptr);
 	wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);
-	wc.hIconSm = wc.hIcon;
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
 	wc.lpszMenuName = nullptr;
-	wc.lpszClassName = wszTitle;
-	wc.cbSize = sizeof(WNDCLASSEX);
+	wc.lpszClassName = L"RLEngine";
+	wc.hIconSm = wc.hIcon;
 
-	RegisterClassEx(&wc);
+	ATOM ret = RegisterClassEx(&wc);
+	if(ret == 0) { return false; }
 
-	if(g_ScreenWidth == 0 || g_ScreenHeight == 0) {
+	g_WindowInitialized = true;
+	return true;
+}
+
+bool Window::CoreShutdown() {
+	RL_ASSERT(g_WindowInitialized, "Window is already shut down!");
+	g_WindowInitialized = false;
+	return UnregisterClass(L"RLEngine", GetModuleHandle(nullptr)) != FALSE;
+}
+
+Window::Window() {
+}
+
+Window::Window(const Window&) {
+}
+
+Window::~Window() {
+}
+
+bool Window::Initialize(const wchar_t* const name, int x, int y, unsigned int width, unsigned int height, Mode mode) {
+	RL_ASSERT(g_WindowInitialized, "Window not started!");
+	m_Mode = mode;
+
+	if(width == 0 || height == 0) {
 		m_Width = GetSystemMetrics(SM_CXSCREEN);
 		m_Height = GetSystemMetrics(SM_CYSCREEN);
-		g_ScreenWidth = m_Width;
-		g_ScreenHeight = m_Height;
+		//g_ScreenWidth = m_Width;
+		//g_ScreenHeight = m_Height;
 	}
-	else {		
-		m_Width = g_ScreenWidth;
-		m_Height = g_ScreenHeight;
+	else {
+		m_Width = width;
+		m_Height = height;
 	}
 
-	if(m_Type == 0) {		
-		DEVMODE dmScreenSettings;
-		memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));
+	if(m_Mode == Mode::FULLSCREEN) {		
+		DEVMODE dmScreenSettings = {};
 		dmScreenSettings.dmSize = sizeof(dmScreenSettings);
-		dmScreenSettings.dmPelsWidth = (unsigned long)m_Width;
-		dmScreenSettings.dmPelsHeight = (unsigned long)m_Height;
+		dmScreenSettings.dmPelsWidth = static_cast<unsigned long>(m_Width);
+		dmScreenSettings.dmPelsHeight = static_cast<unsigned long>(m_Height);
 		dmScreenSettings.dmBitsPerPel = 32;
 		dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 
@@ -80,26 +94,26 @@ bool CWindow::Initialize(HINSTANCE hInstance, const wchar_t* wszTitle) {
 		m_PosY = 0;
 	}
 	else {
-		m_PosX = (GetSystemMetrics(SM_CXSCREEN) - m_Width) / 2;
-		m_PosY = (GetSystemMetrics(SM_CYSCREEN) - m_Height) / 2;
+		m_PosX = x;
+		m_PosY = y;
 	}
 
 	unsigned long style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP;
-	if(m_Type == 1) {
+	if(m_Mode == Mode::WINDOWED) {
 		style = WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 	}
 
-	m_hWnd = CreateWindowEx(WS_EX_APPWINDOW, wc.lpszClassName, wszTitle, style, m_PosX, m_PosY, m_Width, m_Height,
-		nullptr, nullptr, hInstance, this);
-	SetForegroundWindow(m_hWnd);
-	SetFocus(m_hWnd);
+	m_hWnd = CreateWindowEx(WS_EX_APPWINDOW, L"RLEngine", name, style, m_PosX, m_PosY, m_Width, m_Height,
+		nullptr, nullptr, GetModuleHandle(nullptr), this);
+	//SetForegroundWindow(m_hWnd);
+	//SetFocus(m_hWnd);
 
 	return true;
 }
 
-void CWindow::Shutdown() {
+void Window::Shutdown() {
 	// If Fullscreen revert to Windowed mode before shutting down.
-	if(m_Type == 0) {
+	if(m_Mode == Mode::FULLSCREEN) {
 		ChangeDisplaySettings(nullptr, 0);
 	}
 	
@@ -109,52 +123,42 @@ void CWindow::Shutdown() {
 	return;
 }
 
-CWindow::Notification::Enum CWindow::PumpMessages() const {
+void Window::SetMouse(CMouse* mouse) {
+	m_Mouse = mouse;
+}
+
+Window::Notification Window::PumpMessages() const {
 	MSG msg = {};
 	while(PeekMessage(&msg, m_hWnd, 0, 0, PM_REMOVE)) {
-		if(msg.message == WM_QUIT) {
-			Console::Print("WM_QUIT");
+		if(msg.message == WM_CLOSE) {
 			return Notification::CLOSE;
 		}
 		DispatchMessage(&msg);
 	}
 
-	return Notification::Enum::NONE;
+	return Notification::NONE;
 }
 
-HWND CWindow::GethWnd() {
-	return m_hWnd;
-}
-
-int CWindow::GetWidth() {
-	return m_Width;
-}
-
-int CWindow::GetHeight() {
-	return m_Height;
-}
-
-bool CWindow::GetFullscreen() {
-	return m_Type == 0;
-}
-
-LRESULT CWindow::WndProc(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+LRESULT Window::WndProc(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 	switch(msg) {
 	case WM_CLOSE:
 		{
-			PostQuitMessage(0);
+			// Forward the message to PeekMessage. Windows seems to send this
+			// directly to WndProc rather than sticking it in the queue.
+			PostMessage(hWnd, WM_CLOSE, wparam, lparam);
 			return 0;
 		}
 		break;
-#if 0
+#if 1
 	case WM_INPUT:
 		{
+			if(!m_Mouse)
+				break;
 			unsigned int rawInputSize = sizeof(RAWINPUT);
 			static BYTE lpb[sizeof(RAWINPUT)];
-			unsigned int result = GetRawInputData((HRAWINPUT)lparam, RID_INPUT, lpb, &rawInputSize, sizeof(RAWINPUTHEADER));
-			if(result == 0xFFFFFFFF) {
+			uint32_t result = GetRawInputData((HRAWINPUT)lparam, RID_INPUT, lpb, &rawInputSize, sizeof(RAWINPUTHEADER));
+			if(result == -1) {
 				Console::Print("Error in GetRawInputData! - GLE: %u", GetLastError());
-				PostQuitMessage(1);
 				break;
 			}
 
@@ -164,10 +168,6 @@ LRESULT CWindow::WndProc(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 		}
 		break;
 #endif
-	default:
-		{
-			return DefWindowProc(hWnd, msg, wparam, lparam);
-		}
 	}
-	return 0;
+	return DefWindowProc(hWnd, msg, wparam, lparam);
 }

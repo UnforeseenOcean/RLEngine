@@ -123,6 +123,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\Core\Containers\Pair.inl" />
+    <None Include="..\..\src\Core\Window.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
