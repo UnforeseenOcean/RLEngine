@@ -28,8 +28,8 @@
 		#define RL_ASSERT(_EXPR, _MSG) ((_EXPR) ? ((void)0) : assertion_failed(_MSG, __FUNCTION__, __FILE__, __LINE__))
 #endif //0
 
-		#ifdef RL_DEBUG
-			#define RL_ASSERT(_EXPR, _MSG) ((_EXPR) ? ((void)0) : RL_DEBUGBREAK)
+		#ifdef _DEBUG
+			#define RL_ASSERT(_EXPR, _MSG) ((_EXPR) ? ((void)0) : __debugbreak())
 		#else //RL_DEBUG
 			#define RL_ASSERT(_EXPR, _MSG) ((void)0)
 		#endif //RL_DEBUG
