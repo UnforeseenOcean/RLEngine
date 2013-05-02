@@ -114,6 +114,7 @@
     <ClInclude Include="..\..\src\CDirect3D11.hpp" />
     <ClInclude Include="..\..\src\CInput.hpp" />
     <ClInclude Include="..\..\src\Core\Containers\Pair.hpp" />
+    <ClInclude Include="..\..\src\Core\Input\MouseButtons.hpp" />
     <ClInclude Include="..\..\src\CRenderer.hpp" />
     <ClInclude Include="..\..\src\CTimer.hpp" />
     <ClInclude Include="..\..\src\Core\Window.hpp" />
@@ -123,6 +124,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\Core\Containers\Pair.inl" />
+    <None Include="..\..\src\Core\Input\Mouse.inl" />
     <None Include="..\..\src\Core\Window.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

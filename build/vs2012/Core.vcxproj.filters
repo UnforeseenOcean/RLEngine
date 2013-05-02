@@ -106,8 +106,14 @@
     <ClInclude Include="..\..\src\Core\Containers\Pair.hpp">
       <Filter>Header Files\Types</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Core\Input\MouseButtons.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\src\Core\Input\Mouse.inl">
+      <Filter>Header Files</Filter>
+    </None>
     <None Include="..\..\src\Core\Window.inl">
       <Filter>Header Files</Filter>
     </None>

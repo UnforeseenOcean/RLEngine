@@ -1,100 +1,148 @@
 #include "Core.hpp"
 #include "CMouse.hpp"
 
-#ifndef HID_USAGE_PAGE_GENERIC
-	#define HID_USAGE_PAGE_GENERIC ((const USHORT)0x01)
-#endif
-#ifndef HID_USAGE_GENERIC_MOUSE
-	#define HID_USAGE_GENERIC_MOUSE ((const USHORT)0x02)
-#endif
+namespace {
+	bool g_MouseInitialized = false;
 
-CMouse::CMouse() {
-	m_LeftButtonDown = false;
-	m_WheelForward = false;
-	m_WheelBackward = false;
-	m_x = 0;
-	m_y = 0;
+	const USHORT HID_USAGE_PAGE_GENERIC = 0x01;
+	const USHORT HID_USAGE_GENERIC_MOUSE = 0x02;
 }
 
-CMouse::CMouse(const CMouse&) {
+bool CMouse::CoreStartup() {
+	RL_ASSERT(!g_MouseInitialized, "Mouse has already started up!");
+
+	RAWINPUTDEVICE rid[1];
+	rid[0].usUsagePage = HID_USAGE_PAGE_GENERIC;
+	rid[0].usUsage = HID_USAGE_GENERIC_MOUSE;
+	rid[0].dwFlags = 0;
+	rid[0].hwndTarget = nullptr;
+
+	if(RegisterRawInputDevices(rid, 1, sizeof(rid[0])) == FALSE) {
+		return false;
+	}
+
+	g_MouseInitialized = true;
+	return true;
+}
+
+bool CMouse::CoreShutdown() {
+	RL_ASSERT(g_MouseInitialized, "Mouse is already shut down!");
+	g_MouseInitialized = false;
+
+	RAWINPUTDEVICE rid[1];
+	rid[0].usUsagePage = HID_USAGE_PAGE_GENERIC;
+	rid[0].usUsage = HID_USAGE_GENERIC_MOUSE;
+	rid[0].dwFlags = RIDEV_REMOVE;
+	rid[0].hwndTarget = nullptr;
+
+	if(RegisterRawInputDevices(rid, 1, sizeof(rid[0])) == FALSE) {
+		return false;
+	}
+	
+	return true;
+}
+
+CMouse::CMouse() : m_Delta(0,0), m_wheelDelta(0) {
+	RL_ASSERT(g_MouseInitialized, "You must Startup the mouse subsystem first!");
+	ZeroMemory(m_states, sizeof(m_states));
 }
 
 CMouse::~CMouse() {
 }
 
-bool CMouse::Initialize(HWND hwnd) {
-	Console::Print("Initializing Raw Mouse Input.");
-
-	m_RawDevice[0].usUsagePage = 0x01;
-	m_RawDevice[0].usUsage = HID_USAGE_GENERIC_MOUSE;
-	m_RawDevice[0].dwFlags = 0;
-	m_RawDevice[0].hwndTarget = hwnd;
-
-	if (RegisterRawInputDevices(m_RawDevice, 1, sizeof(m_RawDevice[0])) == FALSE) {
-		Console::Print("Error in CMouse::Initialize RegisterRawInputDevices! - GLE: %u", GetLastError());
-		return false;
+void CMouse::OnFrameStart() {
+	for(int i = 0; i < Button::TOTAL; ++i) {
+		m_states[i].m_wentDown = false;
+		m_states[i].m_wentUp = false;
+		//m_states[i].m_isPressed = false;
+		m_states[i].m_isDoubleClicked = false;
 	}
-
-	return true;
-}
-
-void CMouse::Shutdown() {
-	return;
+	m_wheelDelta = 0;
+	m_Delta.Set(0, 0);
 }
 
 void CMouse::Update(RAWINPUT& lpb) {
-	if(lpb.data.mouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_DOWN) {
-		m_LeftButtonDown = true;
+	if(lpb.data.mouse.usFlags) {
+		// Never been set for me, and specs on what most of them
+		// actually mean is sorely lacking.  Also, specs erroneously
+		// indicate MOUSE_MOVE_RELATIVE is a flag, when it's really
+		// 0...
+		return;
+	}
+
+	Console::Print("X: %d + %d, Y: %d + %d", m_Delta.x, lpb.data.mouse.lLastX, m_Delta.y, lpb.data.mouse.lLastY);
+	m_Delta.Set(m_Delta.x + lpb.data.mouse.lLastX, m_Delta.y + lpb.data.mouse.lLastY);
+
+	/*if(lpb.data.mouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_DOWN) {
+		m_states[Button::LEFT].m_wentDown = true;
+		m_states[Button::LEFT].m_isPressed = true;
 	}
 
 	if(lpb.data.mouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_UP) {
-		m_LeftButtonDown = false;
+		m_states[Button::LEFT].m_wentUp = true; //todo: Set m_wentDown to false here?
+		m_states[Button::LEFT].m_isPressed = false;
 	}
 
+	if(lpb.data.mouse.usButtonFlags & RI_MOUSE_RIGHT_BUTTON_DOWN) {
+		m_states[Button::RIGHT].m_wentDown = true;
+		m_states[Button::RIGHT].m_isPressed = true;
+	}
+
+	if(lpb.data.mouse.usButtonFlags & RI_MOUSE_RIGHT_BUTTON_UP) {
+		m_states[Button::RIGHT].m_wentUp = true; //todo: Set m_wentDown to false here?
+		m_states[Button::RIGHT].m_isPressed = false;
+	}
+
+	if(lpb.data.mouse.usButtonFlags & RI_MOUSE_MIDDLE_BUTTON_DOWN) {
+		m_states[Button::MIDDLE].m_wentDown = true;
+		m_states[Button::MIDDLE].m_isPressed = true;
+	}
+
+	if(lpb.data.mouse.usButtonFlags & RI_MOUSE_MIDDLE_BUTTON_UP) {
+		m_states[Button::MIDDLE].m_wentUp = true; //todo: Set m_wentDown to false here?
+		m_states[Button::MIDDLE].m_isPressed = false;
+	}
+
+	if(lpb.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_DOWN) {
+		m_states[Button::FOUR].m_wentDown = true;
+		m_states[Button::FOUR].m_isPressed = true;
+	}
+
+	if(lpb.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_UP) {
+		m_states[Button::FOUR].m_wentUp = true; //todo: Set m_wentDown to false here?
+		m_states[Button::FOUR].m_isPressed = false;
+	}
+	
+	if(lpb.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_DOWN) {
+		m_states[Button::FIVE].m_wentDown = true;
+		m_states[Button::FIVE].m_isPressed = true;
+	}
+
+	if(lpb.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_UP) {
+		m_states[Button::FIVE].m_wentUp = true; //todo: Set m_wentDown to false here?
+		m_states[Button::FIVE].m_isPressed = false;
+	}*/
+
+	// http://msdn.microsoft.com/en-us/library/windows/desktop/ms645578.aspx
+	for(int i = Button::LEFT, buttonflag = RI_MOUSE_LEFT_BUTTON_DOWN; i <= Button::FIVE; ++i) {
+		if(lpb.data.mouse.usButtonFlags & buttonflag) { // Down
+			m_states[i].m_wentDown = true;
+			m_states[i].m_isPressed = true;
+		}
+		buttonflag <<= 1;
+		if(lpb.data.mouse.usButtonFlags & buttonflag) { // Up
+			m_states[i].m_wentUp = true; //todo: Set m_wentDown to false here?
+			m_states[i].m_isPressed = false;
+		}
+		buttonflag <<= 1;
+		/*if(m_states[i].m_wentDown && m_states[i].m_wentUp) {
+			Console::Print("WARNING: MOUSE BUTTON WENT DOWN AND UP IN THE SAME FRAME");
+		}*/
+	}
+	
 	if(lpb.data.mouse.usButtonFlags & RI_MOUSE_WHEEL) {
-		if(lpb.data.mouse.usButtonData == 120) { //down: 65416 up: 120			
-			m_WheelForward = true;
-			m_WheelBackward = false;
-		}
-		else if(lpb.data.mouse.usButtonData == 65416) {
-			m_WheelForward = false;
-			m_WheelBackward = true;
-		}
-		else {
-			Console::Print("MouseWheel Data was not 120 or 65416!");
-		}
+		m_wheelDelta += static_cast<short>(lpb.data.mouse.usButtonData) / WHEEL_DELTA;
 	}
-
-	if(lpb.data.mouse.usFlags & MOUSE_ATTRIBUTES_CHANGED) {
-		Console::Print("Mouse Attributes Changed!");
-	}
-
-	m_x += lpb.data.mouse.lLastX;
-	m_y += lpb.data.mouse.lLastY;
 
 	return;
-}
-
-bool CMouse::IsLeftButtonPressed() {
-	return m_LeftButtonDown;
-}
-
-bool CMouse::IsWheelForward() {
-	bool ret = m_WheelForward;	
-	m_WheelForward = false;
-	return ret;
-}
-
-bool CMouse::IsWheelBackward() {
-	bool ret = m_WheelBackward;
-	m_WheelBackward = false;
-	return ret;
-}
-
-int CMouse::GetX() {
-	return m_x;
-}
-
-int CMouse::GetY() {
-	return m_y;
 }
