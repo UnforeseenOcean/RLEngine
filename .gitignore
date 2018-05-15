@@ -1,7 +1,6 @@
-syntax: glob
-*/[Dd]ebug/
-*/[Rr]elease/
-*/ipch/
+**/[Dd]ebug/
+**/[Rr]elease/
+**/ipch/
 *.*sdf
 *.suo
 *.vcxproj.user
